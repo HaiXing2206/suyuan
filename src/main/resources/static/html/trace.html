@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产品溯源信息 - 产品溯源管理系统</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .trace-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .trace-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .back-button {
+            margin-right: 16px;
+        }
+        .logo-small {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .logo-small h1 {
+            font-size: 1.25rem;
+            margin: 0;
+        }
+        .trace-card {
+            background-color: var(--bg-color);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+        .trace-timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        .trace-timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: var(--primary-color);
+        }
+        .trace-item {
+            position: relative;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: var(--bg-muted);
+            border-radius: var(--radius);
+        }
+        .trace-item::before {
+            content: '';
+            position: absolute;
+            left: -34px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            border: 2px solid var(--bg-color);
+        }
+        .trace-item h6 {
+            color: var(--text-color);
+            margin-bottom: 8px;
+        }
+        .trace-item p {
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        .trace-item small {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .info-label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .info-value {
+            color: var(--text-color);
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="trace-container">
+        <header class="trace-header">
+            <a href="#" id="back-link" class="btn-icon back-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+            </a>
+            <div class="logo-small">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                </svg>
+                <h1>产品溯源信息</h1>
+            </div>
+        </header>
+
+        <div class="card trace-card">
+            <div class="card-header">
+                <h2 class="text-center">基本信息</h2>
+            </div>
+            <div class="card-body">
+                <div class="product-info-list">
+                    <div class="info-item">
+                        <span class="info-label">产品名称</span>
+                        <span id="productName" class="info-value">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">产品编号</span>
+                        <span id="productId" class="info-value">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">生产日期</span>
+                        <span id="productionDate" class="info-value">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">生产厂家</span>
+                        <span id="manufacturer" class="info-value">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card trace-card">
+            <div class="card-header">
+                <h2 class="text-center">溯源记录</h2>
+            </div>
+            <div class="card-body">
+                <div class="trace-timeline" id="traceTimeline">
+                    <div class="loading">正在加载溯源记录...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/pageVisit.js"></script>
+    <script>
+        // 获取URL参数中的产品ID
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+
+        // 记录页面访问
+        recordPageVisit('trace.html');
+
+        // 返回按钮事件
+        document.getElementById('back-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.history.back();
+        });
+
+        // 页面加载完成后获取溯源信息
+        $(document).ready(function() {
+            if (productId) {
+                fetchTraceInfo(productId);
+            } else {
+                alert('未找到产品ID');
+            }
+        });
+
+        // 获取溯源信息
+        function fetchTraceInfo(productId) {
+            // 获取产品基本信息
+            $.ajax({
+                url: '/api/products/' + productId,
+                method: 'GET',
+                success: function(productData) {
+                    // 更新基本信息
+                    $('#productName').text(productData.name || '-');
+                    $('#productId').text(productId || '-');
+                    $('#productionDate').text(productData.productionDate || '-');
+                    $('#manufacturer').text(productData.manufacturer || '-');
+
+                    // 获取溯源记录
+                    $.ajax({
+                        url: '/api/products/' + productId + '/trace',
+                        method: 'GET',
+                        success: function(traceData) {
+                            updateTraceRecords(traceData);
+                        },
+                        error: function(xhr, status, error) {
+                            alert('获取溯源记录失败：' + error);
+                        }
+                    });
+                },
+                error: function(xhr, status, error) {
+                    alert('获取产品信息失败：' + error);
+                }
+            });
+        }
+
+        // 更新溯源记录
+        function updateTraceRecords(records) {
+            const timeline = $('#traceTimeline');
+            timeline.empty();
+
+            if (records && records.length > 0) {
+                records.forEach(record => {
+                    const recordHtml = `
+                        <div class="trace-item">
+                            <h6>${record.stage}</h6>
+                            <p class="mb-1">${record.details}</p>
+                            <small class="text-muted">
+                                操作人: ${record.operator} | 
+                                地点: ${record.location} | 
+                                时间: ${new Date(record.timestamp).toLocaleString()}
+                            </small>
+                        </div>
+                    `;
+                    timeline.append(recordHtml);
+                });
+            } else {
+                timeline.html('<p class="text-center">暂无溯源记录</p>');
+            }
+        }
+    </script>
+</body>
+</html> 

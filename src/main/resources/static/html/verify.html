@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产品溯源验证 - 产品溯源管理系统</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<div class="verify-container">
+    <header class="verify-header">
+        <div class="logo-small">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            </svg>
+            <h1>产品溯源信息</h1>
+        </div>
+    </header>
+
+    <div class="card verify-card">
+        <div class="card-header text-center">
+            <div class="verify-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            <h2 id="product-name">有机大米</h2>
+            <p id="product-batch">批次号: B2023-042</p>
+        </div>
+        <div class="card-body">
+            <div class="verify-section">
+                <h3>基本信息</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                            <polyline points="2 17 12 22 22 17"></polyline>
+                            <polyline points="2 12 12 17 22 12"></polyline>
+                        </svg>
+                        <span class="info-label">批次号:</span>
+                        <span id="info-batch" class="info-value">B2023-042</span>
+                    </div>
+                    <div class="info-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        <span class="info-label">生产日期:</span>
+                        <span id="info-date" class="info-value">2023-04-15</span>
+                    </div>
+                    <div class="info-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                            <path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path>
+                        </svg>
+                        <span class="info-label">生产商:</span>
+                        <span id="info-manufacturer" class="info-value">绿色农场</span>
+                    </div>
+                    <div class="info-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        <span class="info-label">产地:</span>
+                        <span id="info-origin" class="info-value">黑龙江省五常市</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="verify-section">
+                <h3>当前状态</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        <span class="info-label">当前位置:</span>
+                        <span id="info-location" class="info-value">配送中心</span>
+                    </div>
+                    <div class="info-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                            <rect x="1" y="3" width="15" height="13"></rect>
+                            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                            <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                            <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                        </svg>
+                        <span class="info-label">状态:</span>
+                        <span id="info-status" class="info-value"><span class="badge green">运输中</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="verify-section">
+                <h3>供应链追踪</h3>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-marker active"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <h4>配送中心</h4>
+                                <span class="badge green">当前位置</span>
+                            </div>
+                            <p>产品已到达配送中心，等待分发至零售商</p>
+                            <p class="timeline-time">2023-04-18 14:23</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <h4>运输中</h4>
+                                <span class="badge outline">已完成</span>
+                            </div>
+                            <p>产品从加工厂运输至配送中心</p>
+                            <p class="timeline-time">2023-04-17 08:45 - 2023-04-18 14:23</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <h4>加工厂</h4>
+                                <span class="badge outline">已完成</span>
+                            </div>
+                            <p>产品在加工厂完成精加工和包装</p>
+                            <p class="timeline-time">2023-04-16 10:30 - 2023-04-17 08:45</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <h4>收割</h4>
+                                <span class="badge outline">已完成</span>
+                            </div>
+                            <p>产品在原产地收割并初步加工</p>
+                            <p class="timeline-time">2023-04-15 07:00 - 2023-04-16 09:15</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="verify-section blockchain-verify">
+                <div class="blockchain-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    <h3>区块链验证</h3>
+                </div>
+                <div class="divider"></div>
+                <p>此产品信息已通过区块链技术验证，确保信息真实可靠，不可篡改。</p>
+            </div>
+        </div>
+        <div class="card-footer">
+            <a href="index.html" class="btn btn-primary btn-block">访问官方网站</a>
+        </div>
+    </div>
+</div>
+
+<script src="../js/verify.js"></script>
+</body>
+</html>

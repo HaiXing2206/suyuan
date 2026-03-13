@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据分析 - 产品溯源管理系统</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/analysis.js"></script>
+    <script src="../js/sidebar.js"></script>
+</head>
+<body>
+<div class="container">
+    <!-- 侧边栏容器 -->
+    <div class="sidebar-container"></div>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+        <header class="header">
+            <div class="search-bar">
+<!--                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">-->
+<!--                    <circle cx="11" cy="11" r="8"></circle>-->
+<!--                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>-->
+<!--                </svg>-->
+<!--                <input type="search" placeholder="搜索...">-->
+            </div>
+            <div class="user-info">
+                <a href="personal-info.html" class="username-link">
+                    <span id="currentUsername"></span>
+                </a>
+                <button class="logout-btn" onclick="logout()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    退出登录
+                </button>
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="page-header">
+                <h2>数据分析</h2>
+                <p>查看产品溯源系统的各项数据统计和分析</p>
+            </div>
+
+            <div class="stats-cards">
+                <div class="card">
+                    <div class="card-body">
+                        <h3>总扫描次数</h3>
+                        <p class="description">所有产品的二维码扫描总次数</p>
+                        <div class="stat-value" id="qrScanCount">0</div>
+                        <p class="stat-change" id="qrScanGrowth">0%</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h3>平均追踪时长</h3>
+                        <p class="description">产品在供应链中的平均追踪时间</p>
+                        <div class="stat-value" id="avgTrackingTime">0天</div>
+                        <p class="stat-change" id="trackingGrowth">0%</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h3>活跃用户数</h3>
+                        <p class="description">本月使用系统的活跃用户数</p>
+                        <div class="stat-value" id="activeUsers">0</div>
+                        <p class="stat-change" id="userGrowth">0%</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>热门产品排行</h3>
+                        <p class="description">扫描次数最多的前5个产品</p>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="productTypeChart" height="250"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>供应链节点分析</h3>
+                        <p class="description">产品在各供应链节点的停留时间</p>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="supplyChainChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>月度扫描趋势</h3>
+                    <p class="description">过去12个月的二维码扫描次数统计</p>
+                </div>
+                <div class="card-body">
+                    <canvas id="monthlyScanChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    // 显示当前用户名
+    document.addEventListener('DOMContentLoaded', function() {
+        const username = localStorage.getItem('username');
+        if (username) {
+            document.getElementById('currentUsername').textContent = `欢迎，${username}`;
+        }
+    });
+</script>
+</body>
+</html> 

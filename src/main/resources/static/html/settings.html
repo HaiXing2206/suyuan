@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统设置 - 产品溯源管理系统</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/auth.js"></script>
+    <script src="../js/settings.js"></script>
+    <script src="../js/sidebar.js"></script>
+</head>
+<body>
+<div class="container">
+    <!-- 侧边栏容器 -->
+    <div class="sidebar-container"></div>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+        <header class="header">
+            <div class="search-bar">
+<!--                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">-->
+<!--                    <circle cx="11" cy="11" r="8"></circle>-->
+<!--                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>-->
+<!--                </svg>-->
+<!--                <input type="search" placeholder="搜索...">-->
+            </div>
+            <div class="user-info">
+                <a href="personal-info.html" class="username-link">
+                    <span id="currentUsername"></span>
+                </a>
+                <button class="logout-btn" onclick="logout()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    退出登录
+                </button>
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="page-header">
+                <h2>系统设置</h2>
+                <p>管理系统配置和参数设置</p>
+            </div>
+
+            <div class="settings-grid">
+                <!-- 基本设置 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>基本设置</h3>
+                    </div>
+                    <div class="card-body">
+                        <form class="settings-form">
+                            <div class="form-group">
+                                <label for="systemName">系统名称</label>
+                                <input type="text" id="systemName" value="产品溯源管理系统">
+                            </div>
+                            <div class="form-group">
+                                <label for="companyName">公司名称</label>
+                                <input type="text" id="companyName" value="示例科技有限公司">
+                            </div>
+                            <div class="form-group">
+                                <label for="contactEmail">联系邮箱</label>
+                                <input type="email" id="contactEmail" value="contact@example.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="timezone">时区设置</label>
+                                <select id="timezone">
+                                    <option value="Asia/Shanghai" selected>中国标准时间 (UTC+8)</option>
+                                    <option value="UTC">世界标准时间 (UTC)</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 通知设置 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>通知设置</h3>
+                    </div>
+                    <div class="card-body">
+                        <form class="settings-form">
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" data-setting="emailNotification" checked>
+                                    启用邮件通知
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" data-setting="systemNotification" checked>
+                                    启用系统通知
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" data-setting="smsNotification">
+                                    启用短信通知
+                                </label>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 安全设置 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>安全设置</h3>
+                    </div>
+                    <div class="card-body">
+                        <form class="settings-form">
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" data-setting="twoFactorAuth" checked>
+                                    启用双因素认证
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label for="sessionTimeout">会话超时时间（分钟）</label>
+                                <input type="number" id="sessionTimeout" value="30" min="5" max="120">
+                            </div>
+                            <div class="form-group">
+                                <label for="passwordPolicy">密码策略</label>
+                                <select id="passwordPolicy">
+                                    <option value="standard">标准（8位以上，包含字母和数字）</option>
+                                    <option value="strong">强（12位以上，包含大小写字母、数字和特殊字符）</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 数据设置 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>数据设置</h3>
+                    </div>
+                    <div class="card-body">
+                        <form class="settings-form">
+                            <div class="form-group">
+                                <label for="dataRetention">数据保留期限（天）</label>
+                                <input type="number" id="dataRetention" value="365" min="30" max="3650">
+                            </div>
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" data-setting="autoBackup" checked>
+                                    启用自动备份
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label for="backupFrequency">备份频率</label>
+                                <select id="backupFrequency">
+                                    <option value="daily">每天</option>
+                                    <option value="weekly" selected>每周</option>
+                                    <option value="monthly">每月</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-actions">
+                <button class="btn btn-primary" onclick="saveSettings()">保存设置</button>
+                <button class="btn btn-secondary" onclick="resetSettings()">重置</button>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    // 显示当前用户名
+    document.addEventListener('DOMContentLoaded', function() {
+        const username = localStorage.getItem('username');
+        if (username) {
+            document.getElementById('currentUsername').textContent = `欢迎，${username}`;
+        }
+    });
+</script>
+</body>
+</html> 

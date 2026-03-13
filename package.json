@@ -1,0 +1,22 @@
+{
+  "name": "suyuan",
+  "version": "1.0.0",
+  "description": "A blockchain-based product tracing system",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "node deploy/deploy.js"
+  },
+  "keywords": [
+    "blockchain",
+    "ethereum",
+    "product-tracing",
+    "smart-contract"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@truffle/hdwallet-provider": "^1.0.41-1",
+    "web3": "^4.16.0"
+  }
+}

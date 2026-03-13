@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产品溯源管理系统</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../js/index.js"></script>
+    <script src="../js/sidebar.js"></script>
+</head>
+<body>
+<div class="container">
+    <!-- 侧边栏容器 -->
+    <div class="sidebar-container"></div>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+        <header class="header">
+            <div class="search-bar">
+<!--                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">-->
+<!--                    <circle cx="11" cy="11" r="8"></circle>-->
+<!--                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>-->
+<!--                </svg>-->
+                <!-- <input type="search" placeholder="搜索..."> -->
+            </div>
+            <div class="user-info">
+                <a href="personal-info.html" class="username-link">
+                    <span id="currentUsername"></span>
+                </a>
+                <button class="logout-btn" onclick="logout()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    退出登录
+                </button>
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="page-header">
+                <h2 id="welcome-title">加载中...</h2>
+                <p>管理产品信息、生成二维码并追踪供应链中的产品流转</p>
+            </div>
+
+            <div class="stats-cards">
+                <div class="card">
+                    <div class="card-body">
+                        <h3>产品总数</h3>
+                        <p class="description">系统中的产品总数量</p>
+                        <div class="stat-value">0</div>
+                        <p class="stat-change">较上月增长 0%</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h3>活跃追踪</h3>
+                        <p class="description">当前正在追踪的产品</p>
+                        <div class="stat-value">0</div>
+                        <p class="stat-change">较上月增长 0%</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h3>二维码扫描</h3>
+                        <p class="description">本月二维码扫描次数</p>
+                        <div class="stat-value">0</div>
+                        <p class="stat-change">较上月增长 0%</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>最近添加的产品</h3>
+                        <p class="description">系统中最近添加的产品信息</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="recent-products">
+                            <div class="no-data">暂无产品数据</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>最近的供应链活动</h3>
+                        <p class="description">产品在供应链中的最新流转记录</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="activity-list">
+                            <div class="no-data">暂无活动数据</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="../js/auth.js"></script>
+<script src="../js/dashboard.js"></script>
+<script>
+    // 显示当前用户名
+    document.addEventListener('DOMContentLoaded', function() {
+        const username = localStorage.getItem('username');
+        if (username) {
+            document.getElementById('currentUsername').textContent = `欢迎，${username}`;
+        }
+    });
+</script>
+</body>
+</html>
