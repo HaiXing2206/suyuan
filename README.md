@@ -1,364 +1,254 @@
-# 溯源系统（suyuan）
+# 数据要素评估与审计平台（基于现有项目改造方案）
 
-一个基于 **Spring Boot + MySQL + Ethereum/Web3j** 的产品溯源系统，支持产品上链、流转记录、追溯查询、用户管理和统计分析。
+> 本 README 说明“如何将当前项目改造成你要求的平台形态”，重点按流程组织，并明确哪些能力可直接实现、哪些是分阶段建设。
 
-## 项目简介
+## 1. 平台概述
 
-该项目包含三部分能力：
+本平台覆盖完整业务闭环：
 
-- **后端服务（Java）**：提供产品、追溯、用户、系统设置、访问统计等 REST API。
-- **前端页面（静态资源）**：位于 `src/main/resources/static`，包含登录、产品管理、追溯查询、分析看板等页面。
-- **智能合约（Solidity）**：`ProductTracing` 合约用于存储产品信息及供应链流转记录。
+**数据要素登记/采集 → 数据治理 → 评估任务 → 审核复核 → 报告生成与发布 → 归档留痕 → 审计追踪**。
 
-## 技术栈
-
-- Java 17
-- Spring Boot 2.7.x（Web / JPA / Thymeleaf）
-- MySQL 8
-- Web3j 4.x
-- Solidity 0.8.0 + Truffle/Ganache
-- 前端：原生 HTML/CSS/JavaScript
-
-## 目录结构
-
-```text
-.
-├── src/main/java/org/Tracing/
-│   ├── controller/              # 业务接口（产品、追溯、用户、分析、设置、访问统计）
-│   ├── controller/logcontroller # 登录/注册接口
-│   ├── entity/                  # JPA 实体
-│   ├── repository/              # 数据访问层
-│   ├── service/                 # 业务服务层
-│   ├── contract/                # Web3j 生成的合约封装类
-│   └── config/
-├── src/main/resources/
-│   ├── application.yml          # Spring 配置（DB/JPA/端口/JWT）
-│   ├── db/migration/            # 数据库迁移脚本
-│   └── static/                  # 前端静态资源
-├── contracts/Tracing.sol        # Solidity 智能合约
-├── migrations/                  # Truffle 迁移脚本
-├── truffle-config.js            # Truffle 网络配置
-├── pom.xml                      # Maven 配置
-└── suyuanchain.sql              # 数据库初始化脚本
-```
-
-## 主要功能
-
-- 产品创建：创建产品并写入链上，同时同步数据库。
-- 追溯记录：按产品追加流转记录（如生产、运输、仓储、销售）。
-- 追溯查询：查询产品详情和完整流转链路。
-- 用户能力：注册、登录、信息管理、用户列表与状态管理。
-- 分析看板：供应链分析、产品类型占比、月度扫码趋势、热门产品。
-- 页面访问统计：记录页面访问次数并做趋势统计。
-- 系统设置：系统名、通知策略、安全策略等配置读写。
-
-## 运行前准备
-
-1. 安装 JDK 17、Maven 3.8+
-2. 安装并启动 MySQL 8
-3. 安装并启动 Ganache（默认 `127.0.0.1:7545`）
-4. 可选：安装 Truffle（如果需要重新编译/部署合约）
-
-## 配置说明
-
-### 1) 数据库配置
-
-在 `src/main/resources/application.yml` 中按需修改：
-
-- `spring.datasource.url`
-- `spring.datasource.username`
-- `spring.datasource.password`
-
-默认配置库名为 `suyuanchain`，端口 `3306`。
-
-### 2) 区块链配置
-
-`ChainController` 中内置了链节点地址、合约地址和测试私钥，启动前需与你本地 Ganache 账户/已部署合约保持一致：
-
-- `CHAIN_IP`
-- `CONTRACT_ADDRESS`
-- `PRIVATE_KEY`
-- `ACCOUNT_ADDRESS`
-
-> 建议改造成环境变量注入，避免将私钥硬编码在代码中。
-
-## 本地启动
-
-### 方式 A：仅启动后端（默认前端静态资源由后端托管）
-
-```bash
-mvn spring-boot:run
-```
-
-启动后访问：
-
-- 应用首页：`http://localhost:8080/html/index.html`
-- 登录页：`http://localhost:8080/html/login.html`
-
-### 方式 B：先构建再运行
-
-```bash
-mvn clean package
-java -jar target/suyuan-1.0-SNAPSHOT.jar
-```
-
-## 智能合约（可选）
-
-如果你需要重新部署合约：
-
-```bash
-truffle compile
-truffle migrate --network development
-```
-
-部署完成后，把新合约地址更新到 `ChainController`。
-
-## 常用 API（示例）
-
-> 以下仅列出核心接口，完整接口请查看 `controller` 目录。
-
-- 认证
-  - `POST /api/auth/register`
-  - `POST /api/login`
-- 产品
-  - `POST /api/products`
-  - `GET /api/products`
-  - `GET /api/products/{productId}`
-  - `POST /api/products/{productId}/trace`
-  - `GET /api/products/{productId}/trace`
-- 追溯
-  - `GET /api/trace/{productId}`
-  - `POST /api/trace/record`
-- 分析
-  - `GET /api/analysis/supply-chain`
-  - `GET /api/analysis/product-types`
-  - `GET /api/analysis/monthly-scans`
-  - `GET /api/analysis/top-products`
-- 用户与系统
-  - `GET /api/users/list`
-  - `PUT /api/users/{id}/status`
-  - `GET /api/settings`
-  - `PUT /api/settings`
-
-## 如果要加零知识证明（ZKP），详细实施步骤（建议方案）
-
-下面给你一个可以直接落地的方案：先做 **链下证明 + 链上存证**，再升级到 **链上验证器**。
+改造目标是在现有 Spring Boot + MySQL + 前端页面基础上，形成“可运营、可审批、可审计”的数据要素评估系统。
 
 ---
 
-### 第 0 步：先定义“你要证明什么”（业务规则建模）
+## 2. 运行环境
 
-先不要急着写代码，先把证明目标写成可计算规则（电路约束）。
+平台运行环境包括：
 
-建议先从 1~2 个高价值场景入手：
+- **浏览器端**：Chrome / Edge（建议最新版本）
+- **后端部署环境**：JDK 17 + Spring Boot（Linux/Windows 均可）
+- **数据库**：MySQL 8.x
 
-1. **产地合规证明**：证明产品来自允许产区，但不公开具体供应商明细。
-2. **质检合规证明**：证明检测值在阈值范围内，但不公开原始检测数据。
-3. **流程完整性证明**：证明某商品确实经过“生产 -> 运输 -> 仓储 -> 销售”关键节点。
-
-产出物建议：
-
-- `proofType` 列表（如 `origin-proof`、`qc-proof`）
-- 每种 `proofType` 的公开输入（public inputs）定义
-- 每种 `proofType` 的私密输入（private witness）定义
+可选增强：
+- Redis（任务队列、缓存）
+- 对象存储（附件与归档文件）
 
 ---
 
-### 第 1 步：数据库新增证明表（先落地元数据）
+## 3. 模块功能（按流程组织）
 
-**位置建议**：`src/main/java/org/Tracing/entity`、`repository`，配套 migration SQL。
+### 3.1 数据要素台账
 
-新增 `ProofRecord`（建议字段）：
+可落地功能：
+- 数据要素登记（名称、来源、责任人、所属部门、用途）
+- 分类分级（如业务数据、运营数据、敏感数据）
+- 元数据管理（字段定义、口径、更新时间、质量说明）
+- 附件管理（制度文档、采集说明、证明材料）
 
-- `id`：主键
-- `productId`：产品 ID（索引）
-- `proofType`：证明类型（索引）
-- `publicInputsHash`：公开输入哈希（建议 `SHA-256`）
-- `proofHash`：证明文件哈希（建议 `SHA-256`）
-- `proofData`：可选，存压缩后的 proof JSON（大字段）
-- `verifyStatus`：`PENDING` / `VERIFIED` / `FAILED`
-- `verifierMode`：`OFFCHAIN` / `ONCHAIN`
-- `txHash`：若上链，记录交易哈希
-- `errorMessage`：失败原因
-- `createdAt`、`updatedAt`
+### 3.2 数据治理
 
-为什么先建表：
+建议先做“可快速交付”的治理能力：
+- **脱敏**：掩码脱敏（手机号、证件号、邮箱）
+- **质量校验**：完整性、唯一性、格式合法性
+- **标签管理**：业务标签、风险标签、质量标签
+- **血缘关系（可实现基础版）**：记录“来源表 -> 清洗任务 -> 输出结果”链路
 
-- 你可以先把证明流程跑通，即使暂时还没上链验证器。
-- 支持一个产品多次证明（历史可追溯、可审计）。
+### 3.3 评估任务管理
 
----
+- 创建评估任务（任务名、对象范围、负责人、截止时间）
+- 选择指标体系版本（支持多版本并行）
+- 提交计算（触发评估引擎或规则计算）
+- 结果回填（得分、等级、问题清单）
 
-### 第 2 步：后端新增 ZKP 服务层（核心）
+### 3.4 审核复核（多角色审批流）
 
-**位置建议**：`src/main/java/org/Tracing/service/ZkpService.java`
+- 初审：业务部门审核资料完整性
+- 复审：数据治理/风控角色审核规则与结果
+- 终审：管理角色确认发布
+- 支持驳回、补件、再次提交
 
-`ZkpService` 最少做 4 件事：
+### 3.5 报告中心
 
-1. `buildWitness(productId, proofType)`
-   - 从 `Product` + `TraceRecord` 聚合电路需要的数据。
-   - 做字段标准化（时间格式、字符串编码、数值边界）。
-2. `generateProof(witness)`
-   - 调用链下 prover（比如独立 Node 服务：`snarkjs` / `halo2`）。
-   - 返回 `proof` + `publicSignals`。
-3. `verifyProofOffchain(proof, publicSignals)`
-   - 在后端先验证正确性，避免错误 proof 上链浪费 gas。
-4. `persistAndAnchor(...)`
-   - 保存 `ProofRecord`。
-   - 调 `ChainController` 把 `proofHash/publicInputsHash` 上链存证。
+- 报告生成（按任务生成评估报告）
+- 模板管理（标准模板、部门模板）
+- 在线预览（HTML 页面）
+- 导出（PDF/Word，按项目阶段选择）
 
-建议加异步：
+### 3.6 权限与审计
 
-- 证明生成通常耗时，建议改成异步任务（队列或线程池）。
-- API 先返回任务 ID，前端轮询状态。
+- 用户/角色/菜单权限（RBAC）
+- 操作日志（登录、提交、审批、导出）
+- 异常告警（如审批超时、连续失败、越权访问）
 
----
+### 3.7 系统配置
 
-### 第 3 步：Controller 新增证明接口
+- 字典管理（分类、等级、状态）
+- 参数配置（阈值、审批时限、开关项）
+- 通知能力（站内信可先落地，邮件为可选增强）
 
-**位置建议**：`ProductController` 或 `TraceabilityController`
+### 3.8 零知识证明（ZKP）模块（新增）
 
-建议新增接口：
+为满足“可验证但不暴露原始敏感数据”的需求，新增 ZKP 模块，建议采用**链下证明 + 链上/库内存证**的渐进方案：
 
-- `POST /api/products/{productId}/proofs`
-  - 入参：`proofType`
-  - 行为：创建证明任务，返回 `taskId/proofId`
-- `GET /api/products/{productId}/proofs`
-  - 查询该产品所有证明记录
-- `GET /api/products/{productId}/proofs/latest?proofType=...`
-  - 查询最新证明状态
-- `POST /api/products/{productId}/proofs/{proofId}/verify`
-  - 手动重试验证（可选）
+- 证明生成：对关键评估结论生成证明（不暴露原始明细）
+- 证明校验：支持后端离线校验（优先），再扩展链上验证
+- 证明存证：保存 `proofHash`、`publicInputsHash`、校验状态、时间戳
+- 结果绑定：将证明与“评估任务、报告版本、审批结论”进行绑定
 
-返回结构建议统一：
-
-- `success`
-- `proofId`
-- `verifyStatus`
-- `txHash`
-- `message`
+典型证明场景（可先落地 2 个）：
+- 合规阈值证明：证明指标结果满足阈值区间
+- 流程完整性证明：证明任务经过“提交-计算-审核-发布”完整链路
 
 ---
 
-### 第 4 步：合约层新增“证明存证”接口（先做这个）
+## 4. 业务流程说明（1~2页摘要版）
 
-**位置建议**：`contracts/Tracing.sol`，并同步更新 Java 封装类 `ProductTracing` 与 `ChainController`。
+### 主流程
 
-第一阶段（推荐）先做轻量存证：
+1. **任务创建**
+   - 管理员/业务负责人创建评估任务，选择评估对象和指标版本。
+2. **资料准备**
+   - 台账补齐元数据与附件，执行基础治理（脱敏、质量校验、标签）。
+3. **调用评估引擎**
+   - 提交评估任务，按规则计算得分、输出问题项。
+4. **结果回填**
+   - 评估结果写回任务中心，形成可审阅的结构化结果。
+5. **审核复核**
+   - 按“初审 → 复审 → 终审”流转，支持驳回与修订。
+6. **发布报告**
+   - 审核通过后生成正式报告，支持预览与导出。
+7. **归档与审计**
+   - 对任务、附件、审批意见、报告版本进行归档，并保留审计日志。
 
-- `recordProofHash(productId, proofType, proofHash, publicInputsHash)`
-- 事件 `ProofAnchored(productId, proofType, proofHash, publicInputsHash, timestamp)`
+### 流程控制要点
 
-这样做的好处：
-
-- gas 成本低
-- 部署简单
-- 先满足“防篡改审计”
-
-第二阶段再上链验证器：
-
-- 集成 verifier 合约（Groth16/Plonk）
-- 新增 `verifyAndRecordProof(...)`，验证成功才入链
-
----
-
-### 第 5 步：ChainController 增加 proof 上链方法
-
-**位置建议**：`src/main/java/org/Tracing/controller/ChainController.java`
-
-新增方法建议：
-
-- `recordProofHash(String productId, String proofType, String proofHash, String publicInputsHash)`
-- （二期）`verifyAndRecordProof(...proofBytes/publicInputs...)`
-
-要点：
-
-- 参数非空校验、长度校验
-- 交易回执状态校验
-- 异常里保留可读错误（链上 revert reason）
+- 每个节点有明确状态（待处理、处理中、已完成、已驳回）
+- 所有关键动作写入审计日志
+- 每次审批留痕“谁在何时做了什么决策”
 
 ---
 
-### 第 6 步：前端产品详情页增加“证明状态卡片”
+## 5. 数据库与安全
 
-**位置建议**：`src/main/resources/static/html/product-detail.html` + `static/js/product-detail.js`
+结合当前可实现能力，建议按以下策略落地：
 
-建议增加：
+### 5.1 数据分级
 
-- 下拉框选择 `proofType`
-- “生成证明”按钮
-- 状态展示：`PENDING / VERIFIED / FAILED`
-- `txHash` 展示与复制
-- 最近一次证明时间
+- L1：公开数据
+- L2：内部数据
+- L3：敏感数据（需脱敏展示与严格授权）
 
-交互建议：
+### 5.2 权限控制
 
-- 生成后进入轮询（每 2~3 秒）直到状态终态
-- 失败时显示 `errorMessage`
+- 采用 RBAC：用户 -> 角色 -> 权限点（菜单/API/数据范围）
+- 对敏感字段增加“按角色可见”策略
 
----
+### 5.3 日志留存
 
-### 第 7 步：配置与安全（必须做）
+- 操作日志、登录日志、审批日志统一留存
+- 留存周期建议：不少于 180 天（可配置）
 
-新增配置（建议放 `application.yml` + 环境变量）：
+### 5.4 备份策略
 
-- `zkp.prover.url`：链下 prover 服务地址
-- `zkp.timeout.seconds`
-- `zkp.enabledProofTypes`
-- `zkp.anchorOnChain=true/false`
+- MySQL 每日全量备份 + 定时增量备份
+- 关键附件（报告/证明材料）异地备份
+- 定期恢复演练，确保可恢复性
 
-安全建议：
-
-- 不在代码里硬编码 proving key / 私钥
-- proof 原文可不落库，只存 hash + 对象存储 URL
-- 对生成证明接口加权限（至少管理员）
+> 以上策略均为工程可落地做法，不涉及超出当前项目技术栈的“不可交付承诺”。
 
 ---
 
-### 第 8 步：分阶段上线计划（你可以照这个排期）
+## 6. 界面截图清单（建议 12~20 张）
 
-**Phase A（1~2 周）**
+以下为交付文档建议截图目录（最少 12 张，推荐 16 张）：
 
-- ProofRecord 表
-- ZkpService（链下生成+验证）
-- API + 前端状态展示
-- 链上仅 `recordProofHash`
-
-**Phase B（1~2 周）**
-
-- 增加失败重试、异步任务、监控告警
-- 增加 proofType（从 1 个扩到 2~3 个）
-
-**Phase C（2~4 周）**
-
-- 接入链上 verifier
-- 高价值 proofType 切换到“链上验证 + 存证”
+1. 登录页
+2. 首页看板
+3. 数据要素台账列表
+4. 数据要素台账详情（元数据）
+5. 附件管理页面
+6. 数据治理执行页（脱敏/质检）
+7. 标签与血缘页面
+8. 评估任务列表
+9. 任务创建页（指标体系版本选择）
+10. 任务计算提交与状态页
+11. 初审页面
+12. 复审页面
+13. 终审页面
+14. 报告预览页
+15. 报告导出记录页
+16. 权限管理页（用户/角色/菜单）
+17. 操作日志页
+18. 异常告警页
+19. 字典/参数配置页
+20. 站内信通知页
 
 ---
 
-### 最小可用改造清单（MVP Checklist）
+## 7. 改造实施建议（分阶段）
 
-1. 新增 `ProofRecord` 实体 + repository + migration。
-2. 新增 `ZkpService`，跑通 `build -> prove -> verify -> persist`。
-3. 新增 `POST /api/products/{productId}/proofs` 与查询接口。
-4. 合约新增 `recordProofHash` 与事件。
-5. `ChainController` 封装 proof 存证交易。
-6. 产品详情页增加证明状态卡片。
+以下按“第一步、第二步……”描述具体要改什么，便于你直接安排开发：
 
-> 一句话建议：**先用链下验证快速跑通业务闭环，再把关键证明逐步升级为链上验证。**
+### 第一步：修改项目定位与主流程说明（文档与导航层）
 
-## 测试
+- 将系统定位从“溯源”调整为“数据要素评估与审计平台”
+- 在首页/导航体现主流程：台账 → 治理 → 评估任务 → 审核 → 报告 → 归档 → 审计
+- 统一术语：产品/追溯等旧词逐步替换为数据要素/评估任务
 
-```bash
-mvn test
-```
+### 第二步：改造数据模型（数据库与实体）
 
-## 已知注意事项
+- 新增/改造核心表：
+  - 数据要素台账表
+  - 评估任务表
+  - 审批流转表（初审/复审/终审）
+  - 报告表（模板、版本、导出记录）
+  - 审计日志表
+- 增加数据分级字段、敏感标识字段、归档状态字段
 
-- `ChainController` 当前使用硬编码测试私钥/合约地址，仅适合本地开发。
-- 生产环境务必将密钥、JWT 密钥、数据库凭据移入安全配置中心或环境变量。
-- 若你重新部署合约后未同步地址，产品创建/追溯上链会失败。
+### 第三步：实现台账与治理能力（可先做基础版）
 
-## License
+- 台账登记、分类、元数据、附件上传
+- 治理规则：脱敏、完整性/唯一性/格式校验
+- 标签和基础血缘记录（来源 → 处理 → 输出）
 
-当前仓库未声明明确开源许可证；如需开源，请补充 `LICENSE` 文件。
+### 第四步：实现评估任务引擎对接与结果回填
+
+- 任务创建、指标体系版本选择、提交计算
+- 回填得分、等级、问题项
+- 形成可审阅的任务结果页
+
+### 第五步：实现多角色审核复核流程
+
+- 初审、复审、终审节点与权限隔离
+- 支持驳回补件、重新提交、意见留痕
+- 审批全过程写入审计日志
+
+### 第六步：实现报告中心与归档
+
+- 任务报告自动生成（先 HTML，再扩展 PDF/Word）
+- 模板管理、在线预览、导出记录
+- 报告发布后自动归档，保留版本历史
+
+### 第七步：新增零知识证明（ZKP）模块（本次重点）
+
+- 在评估结论发布时生成对应证明（proof）
+- 后端先做 `verifyProofOffchain`，避免错误证明进入正式发布
+- 存储证明记录：`proofType`、`proofHash`、`publicInputsHash`、`verifyStatus`
+- 把证明摘要写入报告和审计记录，支持后续外部核验
+
+建议落地顺序（ZKP子步骤）：
+1. 先定义证明类型与公开输入（例如阈值合规证明）
+2. 新增证明记录表与接口
+3. 对接链下 prover（可独立服务）
+4. 完成后端校验与结果持久化
+5. 在报告页展示“证明已验证/未验证”状态
+
+### 第八步：权限、审计与运维加固
+
+- RBAC 细粒度控制到菜单/API/数据范围
+- 增加异常告警（审批超时、连续失败、越权访问）
+- 建立备份与恢复演练机制
+
+---
+
+## 8. 与当前项目的关系说明
+
+当前代码具备用户、数据对象管理、统计页面、系统设置等基础能力，可作为改造底座。后续重点是：
+
+- 将“产品追溯模型”抽象为“数据要素台账模型”
+- 将“追溯流程”升级为“评估任务+审核复核流程”
+- 补齐报告中心、权限细粒度控制、审计留痕与归档
+- 新增零知识证明模块，实现“可验证、少泄露”的结果可信机制
+
+该路线可以在不推翻现有技术栈的前提下，逐步演进到目标平台。
