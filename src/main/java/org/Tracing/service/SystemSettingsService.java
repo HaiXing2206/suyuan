@@ -111,7 +111,7 @@ public class SystemSettingsService {
     private SystemSettings createDefaultSettings() {
         SystemSettings settings = new SystemSettings();
         settings.setId(UUID.randomUUID().toString());
-        settings.setSystemName("产品溯源管理系统");
+        settings.setSystemName("数据要素评估与审计平台");
         settings.setCompanyName("示例科技有限公司");
         settings.setContactEmail("contact@example.com");
         settings.setTimezone("Asia/Shanghai");

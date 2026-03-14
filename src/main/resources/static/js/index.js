@@ -50,11 +50,11 @@ function updateProductStats(products) {
         const cardType = element.closest('.card').querySelector('h3').textContent;
         let growthRate = 0;
         
-        if (cardType === '产品总数') {
+        if (cardType === '台账条目总数') {
             growthRate = 0;
-        } else if (cardType === '活跃追踪') {
+        } else if (cardType === '进行中评估任务') {
             growthRate = 0;
-        } else if (cardType === '二维码扫描') {
+        } else if (cardType === '待审核事项') {
             growthRate = 0;
         }
         
@@ -73,7 +73,7 @@ function displayRecentProducts(products) {
     recentProductsContainer.innerHTML = ''; // 清空现有内容
 
     if (!Array.isArray(products) || products.length === 0) {
-        recentProductsContainer.innerHTML = '<div class="no-data">暂无产品数据</div>';
+        recentProductsContainer.innerHTML = '<div class="no-data">暂无台账数据</div>';
         return;
     }
 
@@ -82,15 +82,15 @@ function displayRecentProducts(products) {
         productItem.className = 'product-item';
         productItem.innerHTML = `
             <div class="product-info">
-                <div class="info-label">产品名称</div>
+                <div class="info-label">要素名称</div>
                 <div class="info-value">${product.name || ''}</div>
             </div>
             <div class="product-info">
-                <div class="info-label">生产日期</div>
+                <div class="info-label">创建日期</div>
                 <div class="info-value">${formatDate(product.productionDate) || ''}</div>
             </div>
             <div class="product-info">
-                <div class="info-label">生产商</div>
+                <div class="info-label">责任主体</div>
                 <div class="info-value">${product.manufacturer || ''}</div>
             </div>
         `;
@@ -243,11 +243,11 @@ function updateStatistics(stats) {
         const cardType = element.closest('.card').querySelector('h3').textContent;
         let growthRate = 0;
         
-        if (cardType === '产品总数') {
+        if (cardType === '台账条目总数') {
             growthRate = stats.totalProductsGrowth || 0;
-        } else if (cardType === '活跃追踪') {
+        } else if (cardType === '进行中评估任务') {
             growthRate = stats.activeTrackingGrowth || 0;
-        } else if (cardType === '二维码扫描') {
+        } else if (cardType === '待审核事项') {
             growthRate = stats.qrScansGrowth || 0;
         }
         
@@ -265,7 +265,7 @@ function loadChart() {
         data: {
             labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
             datasets: [{
-                label: '产品追踪次数',
+                label: '流程处理次数',
                 data: [65, 59, 80, 81, 56, 55],
                 fill: false,
                 borderColor: 'rgb(75, 192, 192)',
@@ -303,10 +303,10 @@ async function fetchSystemName() {
             document.getElementById('welcome-title').textContent = `欢迎使用${systemName}`;
         } else {
             console.error('获取系统名称失败:', response.status, response.statusText);
-            document.getElementById('welcome-title').textContent = '欢迎使用产品溯源管理系统';
+            document.getElementById('welcome-title').textContent = '欢迎使用数据要素评估与审计平台';
         }
     } catch (error) {
         console.error('获取系统名称出错:', error);
-        document.getElementById('welcome-title').textContent = '欢迎使用产品溯源管理系统';
+        document.getElementById('welcome-title').textContent = '欢迎使用数据要素评估与审计平台';
     }
 } 

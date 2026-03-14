@@ -72,7 +72,7 @@ public class SystemSettingsController {
             return ResponseEntity.ok(systemName);
         } catch (Exception e) {
             logger.error("获取系统名称失败", e);
-            return ResponseEntity.ok("产品溯源管理系统");
+            return ResponseEntity.ok("数据要素评估与审计平台");
         }
     }
 } 
