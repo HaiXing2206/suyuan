@@ -11,4 +11,5 @@ public interface DataElementLedgerRepository extends JpaRepository<DataElementLe
     List<DataElementLedger> findByDepartment(String department);
     List<DataElementLedger> findByDataLevel(String dataLevel);
     List<DataElementLedger> findByArchiveStatus(String archiveStatus);
+    boolean existsByElementNameAndDepartment(String elementName, String department);
 }

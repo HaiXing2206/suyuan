@@ -49,6 +49,21 @@ public class DataElementLedger {
     @Column(name = "quality_note", columnDefinition = "TEXT")
     private String qualityNote;
 
+    @Column(name = "attachment_urls", columnDefinition = "TEXT")
+    private String attachmentUrls;
+
+    @Column(name = "business_tags", length = 255)
+    private String businessTags;
+
+    @Column(name = "risk_tags", length = 255)
+    private String riskTags;
+
+    @Column(name = "quality_tags", length = 255)
+    private String qualityTags;
+
+    @Column(name = "lineage_info", columnDefinition = "TEXT")
+    private String lineageInfo;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -151,6 +166,47 @@ public class DataElementLedger {
 
     public void setQualityNote(String qualityNote) {
         this.qualityNote = qualityNote;
+    }
+
+
+    public String getAttachmentUrls() {
+        return attachmentUrls;
+    }
+
+    public void setAttachmentUrls(String attachmentUrls) {
+        this.attachmentUrls = attachmentUrls;
+    }
+
+    public String getBusinessTags() {
+        return businessTags;
+    }
+
+    public void setBusinessTags(String businessTags) {
+        this.businessTags = businessTags;
+    }
+
+    public String getRiskTags() {
+        return riskTags;
+    }
+
+    public void setRiskTags(String riskTags) {
+        this.riskTags = riskTags;
+    }
+
+    public String getQualityTags() {
+        return qualityTags;
+    }
+
+    public void setQualityTags(String qualityTags) {
+        this.qualityTags = qualityTags;
+    }
+
+    public String getLineageInfo() {
+        return lineageInfo;
+    }
+
+    public void setLineageInfo(String lineageInfo) {
+        this.lineageInfo = lineageInfo;
     }
 
     public LocalDateTime getCreatedAt() {
