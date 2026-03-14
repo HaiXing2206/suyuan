@@ -46,6 +46,15 @@ public class Product {
     @Column(name = "del", nullable = false, columnDefinition = "int default 0")
     private Integer del;
 
+    @Column(name = "data_level", nullable = false, length = 16)
+    private String dataLevel = "L2";
+
+    @Column(name = "sensitive_flag", nullable = false)
+    private Boolean sensitiveFlag = false;
+
+    @Column(name = "archive_status", nullable = false, length = 20)
+    private String archiveStatus = "ACTIVE";
+
     // Getters and Setters
     public String getProductId() {
         return productId;
@@ -141,5 +150,29 @@ public class Product {
 
     public void setDel(Integer del) {
         this.del = del;
+    }
+
+    public String getDataLevel() {
+        return dataLevel;
+    }
+
+    public void setDataLevel(String dataLevel) {
+        this.dataLevel = dataLevel;
+    }
+
+    public Boolean getSensitiveFlag() {
+        return sensitiveFlag;
+    }
+
+    public void setSensitiveFlag(Boolean sensitiveFlag) {
+        this.sensitiveFlag = sensitiveFlag;
+    }
+
+    public String getArchiveStatus() {
+        return archiveStatus;
+    }
+
+    public void setArchiveStatus(String archiveStatus) {
+        this.archiveStatus = archiveStatus;
     }
 } 
