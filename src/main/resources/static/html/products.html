@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>产品管理 - 产品溯源管理系统</title>
+    <title>数据要素台账与治理 - 数据要素评估与审计平台</title>
     <link rel="stylesheet" href="../css/style.css">
     <script src="../js/auth.js"></script>
     <script src="../js/products.js"></script>
@@ -11,19 +11,11 @@
 </head>
 <body>
 <div class="container">
-    <!-- 侧边栏容器 -->
     <div class="sidebar-container"></div>
 
-    <!-- 主内容区 -->
     <main class="main-content">
         <header class="header">
-            <div class="search-bar">
-<!--                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">-->
-<!--                    <circle cx="11" cy="11" r="8"></circle>-->
-<!--                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>-->
-<!--                </svg>-->
-<!--                <input type="search" placeholder="搜索...">-->
-            </div>
+            <div class="search-bar"></div>
             <div class="user-info">
                 <a href="personal-info.html" class="username-link">
                     <span id="currentUsername"></span>
@@ -42,99 +34,205 @@
         <div class="content">
             <div class="page-header">
                 <div>
-                    <h2>产品管理</h2>
-                    <p>管理所有产品信息、生产批次和溯源数据</p>
-                </div>
-                <a href="add-product.html" class="btn btn-primary">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                    添加新产品
-                </a>
-            </div>
-
-            <div class="filter-bar">
-                <div class="search-input">
-                    <input type="text" id="searchInput" placeholder="搜索产品名称、批次号或生产商...">
-                </div>
-                <div class="filter-selects">
-                    <select id="categoryFilter">
-                        <option value="all">所有类别</option>
-                        <option value="food">食品</option>
-                        <option value="beverage">饮料</option>
-                        <option value="agriculture">农产品</option>
-                    </select>
-                    <select id="statusFilter">
-                        <option value="all">所有状态</option>
-                        <option value="active">在售</option>
-                        <option value="inactive">下架</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- 添加产品模态框 -->
-            <div id="productModal" class="modal" style="display: none;">
-                <div class="modal-content">
-                    <h3 id="modalTitle">添加产品</h3>
-                    <form id="productForm">
-                        <div class="form-group">
-                            <label for="productName">产品名称</label>
-                            <input type="text" id="productName" name="name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="productCategory">类别</label>
-                            <select id="productCategory" name="category" required>
-                                <option value="food">食品</option>
-                                <option value="beverage">饮料</option>
-                                <option value="agriculture">农产品</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="productPrice">价格</label>
-                            <input type="number" id="productPrice" name="price" step="0.01" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="productStock">库存</label>
-                            <input type="number" id="productStock" name="stock" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="productStatus">状态</label>
-                            <select id="productStatus" name="status" required>
-                                <option value="active">在售</option>
-                                <option value="inactive">下架</option>
-                            </select>
-                        </div>
-                        <div class="form-actions">
-                            <button type="button" class="btn btn-outline" onclick="closeModal()">取消</button>
-                            <button type="submit" class="btn btn-primary">保存</button>
-                        </div>
-                    </form>
+                    <h2>数据要素台账与治理</h2>
+                    <p>支持台账登记、分类分级、元数据与附件说明、标签与基础血缘记录，以及脱敏和质量校验</p>
                 </div>
             </div>
 
             <div class="card">
                 <div class="card-header">
-                    <h3>产品列表</h3>
-                    <p class="description">系统中所有产品的详细信息和溯源数据</p>
+                    <h3>台账登记（基础版）</h3>
+                    <p class="description">录入数据要素基础信息并写入台账</p>
+                </div>
+                <div class="card-body">
+                    <form id="ledgerForm" class="form-grid">
+                        <div class="form-group">
+                            <label for="elementId">要素ID</label>
+                            <input type="text" id="elementId" required placeholder="例如：DE-2026-001">
+                        </div>
+                        <div class="form-group">
+                            <label for="elementName">要素名称</label>
+                            <input type="text" id="elementName" required placeholder="例如：用户行为日志">
+                        </div>
+                        <div class="form-group">
+                            <label for="source">来源</label>
+                            <input type="text" id="source" required placeholder="例如：APP埋点系统">
+                        </div>
+                        <div class="form-group">
+                            <label for="ownerName">责任人</label>
+                            <input type="text" id="ownerName" required placeholder="例如：张三">
+                        </div>
+                        <div class="form-group">
+                            <label for="department">所属部门</label>
+                            <input type="text" id="department" required placeholder="例如：数据管理部">
+                        </div>
+                        <div class="form-group">
+                            <label for="purpose">用途</label>
+                            <input type="text" id="purpose" required placeholder="例如：营销分析">
+                        </div>
+                        <div class="form-group">
+                            <label for="classificationLevel">分类分级</label>
+                            <select id="classificationLevel" required>
+                                <option value="业务数据">业务数据</option>
+                                <option value="运营数据">运营数据</option>
+                                <option value="敏感数据">敏感数据</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="dataLevel">数据等级</label>
+                            <select id="dataLevel" required>
+                                <option value="L1">L1</option>
+                                <option value="L2" selected>L2</option>
+                                <option value="L3">L3</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="sensitiveFlag">是否敏感</label>
+                            <select id="sensitiveFlag" required>
+                                <option value="false" selected>否</option>
+                                <option value="true">是</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="archiveStatus">归档状态</label>
+                            <select id="archiveStatus" required>
+                                <option value="UNARCHIVED" selected>未归档</option>
+                                <option value="ARCHIVED">已归档</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="metadataDefinition">元数据定义</label>
+                            <input type="text" id="metadataDefinition" placeholder="字段定义、口径、更新时间说明">
+                        </div>
+                        <div class="form-group">
+                            <label for="attachmentUrls">附件链接</label>
+                            <input type="text" id="attachmentUrls" placeholder="多个链接可用逗号分隔">
+                        </div>
+                        <div class="form-group">
+                            <label for="businessTags">业务标签</label>
+                            <input type="text" id="businessTags" placeholder="如：营销,增长">
+                        </div>
+                        <div class="form-group">
+                            <label for="riskTags">风险标签</label>
+                            <input type="text" id="riskTags" placeholder="如：敏感信息,外部共享">
+                        </div>
+                        <div class="form-group">
+                            <label for="qualityTags">质量标签</label>
+                            <input type="text" id="qualityTags" placeholder="如：完整性高,稳定">
+                        </div>
+                        <div class="form-group">
+                            <label for="lineageInfo">基础血缘</label>
+                            <input type="text" id="lineageInfo" placeholder="来源表 -> 清洗任务 -> 输出结果表">
+                        </div>
+                        <div class="form-group">
+                            <label for="qualityNote">质量说明</label>
+                            <input type="text" id="qualityNote" placeholder="完整性、唯一性、格式说明">
+                        </div>
+                        <button type="submit" class="btn btn-primary">保存台账</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>治理规则：格式校验</h3>
+                        <p class="description">校验完整性、唯一性、格式合法性（基础版）</p>
+                    </div>
+                    <div class="card-body">
+                        <form id="validateForm" class="form-grid">
+                            <div class="form-group">
+                                <label for="validateElementName">要素名称</label>
+                                <input type="text" id="validateElementName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="validateDepartment">所属部门</label>
+                                <input type="text" id="validateDepartment" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="formatType">格式类型</label>
+                                <select id="formatType" required>
+                                    <option value="mobile">手机号</option>
+                                    <option value="idCard">证件号</option>
+                                    <option value="email">邮箱</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="formatValue">待校验值</label>
+                                <input type="text" id="formatValue" required>
+                            </div>
+                            <button type="submit" class="btn btn-outline">执行校验</button>
+                        </form>
+                        <p id="validateResult" style="margin-top: 10px; color: #334155;">尚未执行</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>治理规则：敏感脱敏</h3>
+                        <p class="description">支持手机号、证件号、邮箱掩码脱敏</p>
+                    </div>
+                    <div class="card-body">
+                        <form id="maskForm" class="form-grid">
+                            <div class="form-group">
+                                <label for="maskType">脱敏类型</label>
+                                <select id="maskType" required>
+                                    <option value="mobile">手机号</option>
+                                    <option value="idCard">证件号</option>
+                                    <option value="email">邮箱</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="maskValue">原始值</label>
+                                <input type="text" id="maskValue" required>
+                            </div>
+                            <button type="submit" class="btn btn-outline">执行脱敏</button>
+                        </form>
+                        <p id="maskResult" style="margin-top: 10px; color: #334155;">尚未执行</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-bar">
+                <div class="search-input">
+                    <input type="text" id="searchInput" placeholder="搜索要素名称 / 来源 / 责任人 / 部门...">
+                </div>
+                <div class="filter-selects">
+                    <select id="levelFilter">
+                        <option value="all">全部等级</option>
+                        <option value="L1">L1</option>
+                        <option value="L2">L2</option>
+                        <option value="L3">L3</option>
+                    </select>
+                    <select id="sensitiveFilter">
+                        <option value="all">全部敏感状态</option>
+                        <option value="true">敏感</option>
+                        <option value="false">非敏感</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>数据要素台账列表</h3>
+                    <p class="description">展示台账信息、标签与基础血缘</p>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
                             <tr>
-                                <th>产品ID</th>
-                                <th>产品名称</th>
-                                <th>生产商</th>
-                                <th>批次号</th>
-                                <th>生产日期</th>
-                                <th>产地</th>
+                                <th>要素ID</th>
+                                <th>要素名称</th>
+                                <th>部门/责任人</th>
+                                <th>来源/用途</th>
+                                <th>分级/敏感</th>
+                                <th>标签</th>
+                                <th>血缘</th>
                                 <th>操作</th>
                             </tr>
                             </thead>
-                            <tbody id="productTableBody">
-                                <!-- 产品数据将通过JavaScript动态加载 -->
-                            </tbody>
+                            <tbody id="productTableBody"></tbody>
                         </table>
                     </div>
                 </div>
@@ -142,5 +240,14 @@
         </div>
     </main>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const username = localStorage.getItem('username');
+        if (username) {
+            document.getElementById('currentUsername').textContent = `欢迎，${username}`;
+        }
+    });
+</script>
 </body>
 </html>
