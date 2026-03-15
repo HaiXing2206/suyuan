@@ -289,12 +289,25 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    refreshApprovalStageLabel();
-    // 初始加载用户列表
-    loadUsers();
-    loadPendingApprovals();
-    loadRejectedTasks();
-    loadReportTaskOptions().then(() => loadEvaluationReports());
+    if (document.getElementById('approvalStageLabel')) {
+        refreshApprovalStageLabel();
+    }
+
+    if (document.getElementById('userTableBody')) {
+        loadUsers();
+    }
+
+    if (document.getElementById('approvalTaskTableBody')) {
+        loadPendingApprovals();
+    }
+
+    if (document.getElementById('rejectedTaskTableBody')) {
+        loadRejectedTasks();
+    }
+
+    if (document.getElementById('reportTaskSelect')) {
+        loadReportTaskOptions().then(() => loadEvaluationReports());
+    }
 });
 
 
