@@ -14,14 +14,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChainController {
-    private final String CHAIN_IP = "http://127.0.0.1:7545";
-    private static final String CONTRACT_ADDRESS = "0x4dfECf60c2c205a8177d6c5588DCb9Eddad3AD3a";
-    private static final String PRIVATE_KEY = "0x439725c0fe82193e9ee1744565fb1eb3b98429cdd4761e6de8dd51d964025331";
-    private static final String ACCOUNT_ADDRESS = "0x203badf25BFC4A7011D1C8b76447df36e830690c";
+    private static final String CHAIN_IP = envOrDefault("CHAIN_RPC_URL", "http://127.0.0.1:7545");
+    private static final String CONTRACT_ADDRESS = envOrDefault("PRODUCT_TRACING_CONTRACT_ADDRESS", "");
+    private static final String PRIVATE_KEY = envOrDefault("CHAIN_PRIVATE_KEY", "");
+    private static final String ACCOUNT_ADDRESS = envOrDefault("CHAIN_ACCOUNT_ADDRESS", "");
 
     private static Web3j web3j;
     private static ProductTracing productTracing;
     private static ChainController instance;
+
+    private static String envOrDefault(String key, String defaultValue) {
+        String value = System.getenv(key);
+        if (value == null || value.trim().isEmpty()) {
+            return defaultValue;
+        }
+        return value.trim();
+    }
+
+    private static String requireConfig(String value, String message) {
+        if (value == null || value.trim().isEmpty()) {
+            throw new IllegalStateException(message);
+        }
+        return value.trim();
+    }
 
     private ChainController() {
         try {
@@ -33,7 +48,7 @@ public class ChainController {
     }
 
     private void initializeWeb3j() throws Exception {
-        HttpService httpService = new HttpService(CHAIN_IP);
+        HttpService httpService = new HttpService(requireConfig(CHAIN_IP, "缺少链节点配置: CHAIN_RPC_URL"));
         web3j = Web3j.build(httpService);
         
         // 验证连接
@@ -41,16 +56,16 @@ public class ChainController {
         System.out.println("已连接到链，ID: " + chainId);
         
         // 验证账户余额
-        BigInteger balance = web3j.ethGetBalance(ACCOUNT_ADDRESS, DefaultBlockParameterName.LATEST).send().getBalance();
+        BigInteger balance = web3j.ethGetBalance(requireConfig(ACCOUNT_ADDRESS, "缺少账户地址配置: CHAIN_ACCOUNT_ADDRESS"), DefaultBlockParameterName.LATEST).send().getBalance();
         System.out.println("账户余额: " + balance + " wei");
         
-        Credentials credentials = Credentials.create(PRIVATE_KEY);
+        Credentials credentials = Credentials.create(requireConfig(PRIVATE_KEY, "缺少私钥配置: CHAIN_PRIVATE_KEY"));
         System.out.println("使用账户: " + credentials.getAddress());
         System.out.println("账户地址匹配: " + credentials.getAddress().equalsIgnoreCase(ACCOUNT_ADDRESS));
     }
 
     private void initializeContract() throws Exception {
-        Credentials credentials = Credentials.create(PRIVATE_KEY);
+        Credentials credentials = Credentials.create(requireConfig(PRIVATE_KEY, "缺少私钥配置: CHAIN_PRIVATE_KEY"));
         BigInteger chainId = web3j.ethChainId().send().getChainId();
         RawTransactionManager transactionManager = new RawTransactionManager(web3j, credentials, chainId.longValue());
         
@@ -59,7 +74,7 @@ public class ChainController {
         BigInteger gasLimit = BigInteger.valueOf(3000000L);     // 3M gas limit
         StaticGasProvider gasProvider = new StaticGasProvider(gasPrice, gasLimit);
         
-        productTracing = ProductTracing.load(CONTRACT_ADDRESS, web3j, transactionManager, gasProvider);
+        productTracing = ProductTracing.load(requireConfig(CONTRACT_ADDRESS, "缺少合约地址配置: PRODUCT_TRACING_CONTRACT_ADDRESS"), web3j, transactionManager, gasProvider);
         
         if (productTracing == null) {
             throw new RuntimeException("加载合约实例失败");
@@ -184,23 +199,27 @@ public class ChainController {
     // 验证方法
     private void validateProductParameters(String productId, String name, String manufacturer, 
                                          String batchNumber, String origin) {
-        if (productId == null || name == null || manufacturer == null || 
-            batchNumber == null || origin == null) {
+        if (isBlank(productId) || isBlank(name) || isBlank(manufacturer) ||
+            isBlank(batchNumber) || isBlank(origin)) {
             throw new IllegalArgumentException("所有参数不能为空");
         }
     }
 
     private void validateSupplyChainParameters(String productId, String action, 
                                              String location, String details) {
-        if (productId == null || action == null || location == null || details == null) {
+        if (isBlank(productId) || isBlank(action) || isBlank(location) || isBlank(details)) {
             throw new IllegalArgumentException("所有参数不能为空");
         }
     }
 
     private void validateProductId(String productId) {
-        if (productId == null || productId.trim().isEmpty()) {
+        if (isBlank(productId)) {
             throw new IllegalArgumentException("商品ID不能为空");
         }
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 
     private void validateIndex(BigInteger index) {
