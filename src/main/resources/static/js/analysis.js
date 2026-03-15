@@ -623,11 +623,19 @@ async function loadEvaluationTasks() {
 
 // 页面加载完成后初始化图表
 document.addEventListener('DOMContentLoaded', function() {
-    initCharts();
-    fetchStatistics();
-    fetchSupplyChainAnalysis();
-    fetchProductTypeDistribution();
-    bindEvaluationTaskForm();
-    bindResultBackfillForm();
-    loadEvaluationTasks();
+    const hasGovernanceDashboard = !!document.getElementById('monthlyScanChart');
+    const hasTaskPage = !!document.getElementById('evaluationTaskForm');
+
+    if (hasGovernanceDashboard) {
+        initCharts();
+        fetchStatistics();
+        fetchSupplyChainAnalysis();
+        fetchProductTypeDistribution();
+    }
+
+    if (hasTaskPage) {
+        bindEvaluationTaskForm();
+        bindResultBackfillForm();
+        loadEvaluationTasks();
+    }
 });
