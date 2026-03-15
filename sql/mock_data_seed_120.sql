@@ -8,11 +8,6 @@ SET FOREIGN_KEY_CHECKS = 0;
 START TRANSACTION;
 
 -- 1) 生成 120 条数据要素台账（data_element_ledgers）
-WITH RECURSIVE seq AS (
-    SELECT 1 AS n
-    UNION ALL
-    SELECT n + 1 FROM seq WHERE n < 120
-)
 INSERT INTO data_element_ledgers (
     element_id,
     element_name,
@@ -27,12 +22,12 @@ INSERT INTO data_element_ledgers (
     metadata_definition,
     quality_note,
     created_at,
-    updated_at,
-    attachment_urls,
-    business_tags,
-    risk_tags,
-    quality_tags,
-    lineage_info
+    updated_at
+)
+WITH RECURSIVE seq AS (
+    SELECT 1 AS n
+    UNION ALL
+    SELECT n + 1 FROM seq WHERE n < 120
 )
 SELECT
     CONCAT('ELM-', LPAD(n, 4, '0')),
@@ -48,12 +43,7 @@ SELECT
     CONCAT('{"fields":["f', n, '","f', n + 1, '"],"ver":"v', 1 + (n % 3), '"}'),
     ELT(1 + (n % 4), '完整性良好', '存在少量缺失', '需补充口径说明', '建议增加校验规则'),
     DATE_SUB(NOW(), INTERVAL (120 - n) DAY),
-    DATE_SUB(NOW(), INTERVAL (120 - n) DAY),
-    CONCAT('https://mock.local/attach/ELM-', LPAD(n, 4, '0')),
-    ELT(1 + (n % 4), '核心业务', '增长分析', '运营监控', '合规治理'),
-    ELT(1 + (n % 4), '低风险', '中风险', '高风险', '需复核'),
-    ELT(1 + (n % 4), 'A', 'B', 'C', 'D'),
-    CONCAT('来源系统->ODS->DWD->APP(', n, ')')
+    DATE_SUB(NOW(), INTERVAL (120 - n) DAY)
 FROM seq
 ON DUPLICATE KEY UPDATE
     updated_at = VALUES(updated_at),
@@ -61,11 +51,6 @@ ON DUPLICATE KEY UPDATE
     archive_status = VALUES(archive_status);
 
 -- 2) 生成 120 条评估任务（evaluation_tasks）
-WITH RECURSIVE seq AS (
-    SELECT 1 AS n
-    UNION ALL
-    SELECT n + 1 FROM seq WHERE n < 120
-)
 INSERT INTO evaluation_tasks (
     task_id,
     task_name,
@@ -82,6 +67,11 @@ INSERT INTO evaluation_tasks (
     archive_status,
     created_at,
     updated_at
+)
+WITH RECURSIVE seq AS (
+    SELECT 1 AS n
+    UNION ALL
+    SELECT n + 1 FROM seq WHERE n < 120
 )
 SELECT
     CONCAT('TSK-', LPAD(n, 4, '0')),
@@ -107,11 +97,6 @@ ON DUPLICATE KEY UPDATE
     result_grade = VALUES(result_grade);
 
 -- 3) 为每个任务生成 3 条审批流记录，共 360 条（approval_flows）
-WITH RECURSIVE seq AS (
-    SELECT 1 AS n
-    UNION ALL
-    SELECT n + 1 FROM seq WHERE n < 120
-)
 INSERT INTO approval_flows (
     task_id,
     approval_stage,
@@ -120,6 +105,11 @@ INSERT INTO approval_flows (
     status,
     comment,
     action_time
+)
+WITH RECURSIVE seq AS (
+    SELECT 1 AS n
+    UNION ALL
+    SELECT n + 1 FROM seq WHERE n < 120
 )
 SELECT CONCAT('TSK-', LPAD(n, 4, '0')), 'INITIAL', 'BUSINESS_REVIEWER', CONCAT('reviewer_biz_', LPAD(1 + (n % 12), 2, '0')),
        ELT(1 + (n % 3), 'APPROVED', 'APPROVED', 'REJECTED'),
@@ -140,11 +130,6 @@ SELECT CONCAT('TSK-', LPAD(n, 4, '0')), 'FINAL', 'MANAGER', CONCAT('manager_', L
 FROM seq;
 
 -- 4) 生成 120 条评估报告（evaluation_reports）
-WITH RECURSIVE seq AS (
-    SELECT 1 AS n
-    UNION ALL
-    SELECT n + 1 FROM seq WHERE n < 120
-)
 INSERT INTO evaluation_reports (
     task_id,
     report_name,
@@ -155,6 +140,11 @@ INSERT INTO evaluation_reports (
     export_status,
     archive_status,
     created_at
+)
+WITH RECURSIVE seq AS (
+    SELECT 1 AS n
+    UNION ALL
+    SELECT n + 1 FROM seq WHERE n < 120
 )
 SELECT
     CONCAT('TSK-', LPAD(n, 4, '0')),
@@ -169,11 +159,6 @@ SELECT
 FROM seq;
 
 -- 5) 生成 150 条审计日志（audit_logs）
-WITH RECURSIVE seq AS (
-    SELECT 1 AS n
-    UNION ALL
-    SELECT n + 1 FROM seq WHERE n < 150
-)
 INSERT INTO audit_logs (
     business_type,
     business_id,
@@ -184,6 +169,11 @@ INSERT INTO audit_logs (
     result_status,
     details,
     created_at
+)
+WITH RECURSIVE seq AS (
+    SELECT 1 AS n
+    UNION ALL
+    SELECT n + 1 FROM seq WHERE n < 150
 )
 SELECT
     ELT(1 + (n % 4), 'LEDGER', 'TASK', 'APPROVAL', 'REPORT'),
