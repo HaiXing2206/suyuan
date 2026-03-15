@@ -268,10 +268,68 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 300));
     }
 
+    const roleSelect = document.getElementById('approverRoleFilter');
+    if (roleSelect) {
+        roleSelect.addEventListener('change', () => {
+            refreshApprovalStageLabel();
+            loadPendingApprovals();
+        });
+    }
+
+    refreshApprovalStageLabel();
     // 初始加载用户列表
     loadUsers();
     loadPendingApprovals();
+    loadRejectedTasks();
 });
+
+
+function getStageByRole(role) {
+    const map = {
+        BUSINESS_REVIEWER: 'INITIAL',
+        RISK_REVIEWER: 'REVIEW',
+        MANAGER: 'FINAL'
+    };
+    return map[role] || 'INITIAL';
+}
+
+function getStageLabelByRole(role) {
+    const map = {
+        BUSINESS_REVIEWER: '初审（自动匹配）',
+        RISK_REVIEWER: '复审（自动匹配）',
+        MANAGER: '终审（自动匹配）'
+    };
+    return map[role] || '初审（自动匹配）';
+}
+
+function formatApprovalStatus(status) {
+    const map = {
+        PENDING_INITIAL_REVIEW: '待初审',
+        PENDING_REVIEW: '待复审',
+        PENDING_FINAL: '待终审',
+        APPROVED: '已通过',
+        REJECTED: '已驳回'
+    };
+    return map[status] || status || '-';
+}
+
+function formatApprovalStage(stage) {
+    const map = {
+        INITIAL: '初审',
+        REVIEW: '复审',
+        FINAL: '终审',
+        RESUBMIT: '补件重提'
+    };
+    return map[stage] || stage || '-';
+}
+
+function refreshApprovalStageLabel() {
+    const role = document.getElementById('approverRoleFilter')?.value || 'BUSINESS_REVIEWER';
+    const stageLabel = document.getElementById('approvalStageLabel');
+    if (stageLabel) {
+        stageLabel.value = getStageLabelByRole(role);
+    }
+}
 
 async function loadPendingApprovals() {
     const tableBody = document.getElementById('approvalTaskTableBody');
@@ -288,32 +346,34 @@ async function loadPendingApprovals() {
         }
         const tasks = await response.json();
         if (!Array.isArray(tasks) || tasks.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="5">当前角色暂无待审核任务</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="6">当前角色暂无待审核任务</td></tr>';
             return;
         }
 
         tableBody.innerHTML = tasks.map(task => `
             <tr>
                 <td>${task.taskName || '-'}</td>
+                <td>${task.elementId || '-'}</td>
                 <td>${task.indicatorVersion || '-'}</td>
-                <td>${task.status || '-'}</td>
+                <td>${formatApprovalStatus(task.status)}</td>
                 <td>${task.resultScore || '-'} / ${task.resultGrade || '-'}</td>
                 <td>
-                    <button class="btn btn-primary" onclick="approvalAction('${task.taskId}', 'APPROVE')">通过</button>
-                    <button class="btn btn-outline" onclick="approvalAction('${task.taskId}', 'REJECT')">驳回</button>
-                    <button class="btn btn-outline" onclick="approvalAction('${task.taskId}', 'RESUBMIT')">补件重提</button>
-                    <button class="btn btn-outline" onclick="showApprovalTimeline('${task.taskId}')">查看留痕</button>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="approvalAction('${task.taskId}', 'APPROVE')">通过</button>
+                        <button class="btn btn-outline" onclick="approvalAction('${task.taskId}', 'REJECT')">驳回</button>
+                        <button class="btn btn-outline" onclick="showApprovalTimeline('${task.taskId}')">查看留痕</button>
+                    </div>
                 </td>
             </tr>
         `).join('');
     } catch (error) {
-        tableBody.innerHTML = `<tr><td colspan="5">${error.message}</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="6">${error.message}</td></tr>`;
     }
 }
 
 async function approvalAction(taskId, action) {
     const role = document.getElementById('approverRoleFilter')?.value || 'BUSINESS_REVIEWER';
-    const stage = document.getElementById('approvalStage')?.value || 'INITIAL';
+    const stage = getStageByRole(role);
     const comment = document.getElementById('approvalComment')?.value || '';
     const username = localStorage.getItem('username') || 'system';
 
@@ -335,6 +395,7 @@ async function approvalAction(taskId, action) {
         }
         showToast('操作成功，已写入审批留痕', 'success');
         await loadPendingApprovals();
+        await loadRejectedTasks();
     } catch (error) {
         showToast(error.message, 'error');
     }
@@ -347,17 +408,74 @@ async function showApprovalTimeline(taskId) {
             throw new Error('获取审批留痕失败');
         }
         const timeline = await response.json();
-        if (!Array.isArray(timeline) || timeline.length === 0) {
-            showToast('暂无审批留痕', 'info');
+        const tableBody = document.getElementById('approvalTimelineBody');
+        const modal = document.getElementById('approvalTimelineModal');
+        if (!tableBody || !modal) {
             return;
         }
 
-        const content = timeline
-            .map(item => `${item.actionTime} | ${item.approvalStage} | ${item.approverName}(${item.approverRole}) | ${item.status} | ${item.comment || '-'}`)
-            .join('\n');
-        alert(content);
+        if (!Array.isArray(timeline) || timeline.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="5">暂无审批留痕</td></tr>';
+        } else {
+            tableBody.innerHTML = timeline.map(item => `
+                <tr>
+                    <td>${item.actionTime || '-'}</td>
+                    <td>${formatApprovalStage(item.approvalStage)}</td>
+                    <td>${item.approverName || '-'}（${item.approverRole || '-'}）</td>
+                    <td>${item.status || '-'}</td>
+                    <td>${item.comment || '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+        modal.style.display = 'flex';
     } catch (error) {
         showToast(error.message, 'error');
+    }
+}
+
+function closeApprovalTimelineModal() {
+    const modal = document.getElementById('approvalTimelineModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+async function loadRejectedTasks() {
+    const tableBody = document.getElementById('rejectedTaskTableBody');
+    if (!tableBody) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/evaluation-tasks');
+        if (!response.ok) {
+            throw new Error('加载驳回任务失败');
+        }
+        const tasks = await response.json();
+        const rejectedTasks = (Array.isArray(tasks) ? tasks : []).filter(task => task.status === 'REJECTED');
+
+        if (rejectedTasks.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="5">暂无驳回任务</td></tr>';
+            return;
+        }
+
+        tableBody.innerHTML = rejectedTasks.map(task => `
+            <tr>
+                <td>${task.taskName || '-'}</td>
+                <td>${task.elementId || '-'}</td>
+                <td>${task.indicatorVersion || '-'}</td>
+                <td>${formatApprovalStatus(task.status)}</td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn btn-outline" onclick="approvalAction('${task.taskId}', 'RESUBMIT')">补件重提</button>
+                        <button class="btn btn-outline" onclick="showApprovalTimeline('${task.taskId}')">查看留痕</button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    } catch (error) {
+        tableBody.innerHTML = `<tr><td colspan="5">${error.message}</td></tr>`;
     }
 }
 

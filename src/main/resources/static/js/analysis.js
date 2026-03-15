@@ -445,6 +445,86 @@ function initCharts() {
     initMonthlyScanChart();
 }
 
+
+function formatTaskStatus(status) {
+    const mapping = {
+        DRAFT: '草稿',
+        CALCULATING: '计算中',
+        PENDING_INITIAL_REVIEW: '待初审',
+        PENDING_REVIEW: '待复审',
+        PENDING_FINAL_REVIEW: '待终审',
+        COMPLETED: '已完成'
+    };
+    return mapping[status] || status || '-';
+}
+
+async function viewTaskDetail(taskId) {
+    try {
+        const response = await fetch(`/api/evaluation-tasks/${taskId}`);
+        if (!response.ok) {
+            throw new Error('获取任务详情失败');
+        }
+        const task = await response.json();
+        const panel = document.getElementById('taskResultPanel');
+        const taskTitle = document.getElementById('selectedTaskTitle');
+        const selectedTaskId = document.getElementById('selectedTaskId');
+        const resultScore = document.getElementById('resultScore');
+        const resultGrade = document.getElementById('resultGrade');
+        const issueList = document.getElementById('issueList');
+
+        selectedTaskId.value = task.taskId || '';
+        taskTitle.textContent = `${task.taskName || '-'}（状态：${formatTaskStatus(task.status)}，指标版本：${task.indicatorVersion || '-'}）`;
+        resultScore.value = task.resultScore ?? '';
+        resultGrade.value = task.resultGrade || '';
+        issueList.value = task.issueList || '';
+        panel.style.display = 'block';
+        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (error) {
+        showNotification(`获取任务详情失败：${error.message}`, 'error');
+    }
+}
+
+function bindResultBackfillForm() {
+    const form = document.getElementById('taskResultForm');
+    if (!form) {
+        return;
+    }
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const taskId = document.getElementById('selectedTaskId').value;
+        if (!taskId) {
+            showNotification('请先选择一条任务记录', 'error');
+            return;
+        }
+
+        const payload = {
+            resultScore: Number(document.getElementById('resultScore').value),
+            resultGrade: document.getElementById('resultGrade').value,
+            issueList: document.getElementById('issueList').value
+        };
+
+        const operatorName = localStorage.getItem('username') || 'system';
+
+        try {
+            const response = await fetch(`/api/evaluation-tasks/${taskId}/results?operatorName=${encodeURIComponent(operatorName)}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) {
+                throw new Error('回填结果失败');
+            }
+            showNotification('任务结果回填成功', 'success');
+            await loadEvaluationTasks();
+            await viewTaskDetail(taskId);
+        } catch (error) {
+            showNotification(`回填结果失败：${error.message}`, 'error');
+        }
+    });
+}
+
 function bindEvaluationTaskForm() {
     const form = document.getElementById('evaluationTaskForm');
     if (!form) {
@@ -516,24 +596,28 @@ async function loadEvaluationTasks() {
         }
         const tasks = await response.json();
         if (!Array.isArray(tasks) || tasks.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="6">暂无评估任务，请先创建。</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="7">暂无评估任务，请先创建。</td></tr>';
             return;
         }
 
         tableBody.innerHTML = tasks.map(task => `
             <tr>
                 <td>${task.taskName || '-'}</td>
+                <td>${task.elementId || '-'}</td>
                 <td>${task.indicatorVersion || '-'}</td>
-                <td>${task.status || '-'}</td>
+                <td>${formatTaskStatus(task.status)}</td>
                 <td>${task.resultScore || '-'} / ${task.resultGrade || '-'}</td>
                 <td title="${task.issueList || ''}">${(task.issueList || '-').slice(0, 28)}</td>
                 <td>
-                    <button class="btn btn-outline" onclick="triggerTaskCalculation('${task.taskId}')">提交计算</button>
+                    <div class="action-buttons">
+                        <button class="btn btn-outline" onclick="triggerTaskCalculation('${task.taskId}')">提交计算</button>
+                        <button class="btn btn-outline" onclick="viewTaskDetail('${task.taskId}')">审阅/回填</button>
+                    </div>
                 </td>
             </tr>
         `).join('');
     } catch (error) {
-        tableBody.innerHTML = `<tr><td colspan="6">${error.message}</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="7">${error.message}</td></tr>`;
     }
 }
 
@@ -544,5 +628,6 @@ document.addEventListener('DOMContentLoaded', function() {
     fetchSupplyChainAnalysis();
     fetchProductTypeDistribution();
     bindEvaluationTaskForm();
+    bindResultBackfillForm();
     loadEvaluationTasks();
 });

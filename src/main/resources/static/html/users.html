@@ -95,12 +95,8 @@
                             <input id="approvalComment" type="text" placeholder="请输入审批意见/驳回原因">
                         </div>
                         <div class="form-group">
-                            <label for="approvalStage">审批阶段</label>
-                            <select id="approvalStage">
-                                <option value="INITIAL">初审</option>
-                                <option value="REVIEW">复审</option>
-                                <option value="FINAL">终审</option>
-                            </select>
+                            <label>当前审批阶段</label>
+                            <input id="approvalStageLabel" type="text" value="初审（自动匹配）" readonly>
                         </div>
                         <button class="btn btn-outline" type="button" onclick="loadPendingApprovals()">刷新待办</button>
                     </div>
@@ -110,6 +106,7 @@
                             <thead>
                             <tr>
                                 <th>任务名称</th>
+                                <th>数据要素ID</th>
                                 <th>指标版本</th>
                                 <th>当前状态</th>
                                 <th>得分/等级</th>
@@ -119,10 +116,50 @@
                             <tbody id="approvalTaskTableBody"></tbody>
                         </table>
                     </div>
+
+                    <div class="table-responsive" style="margin-top: 16px;">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>已驳回任务</th>
+                                <th>数据要素ID</th>
+                                <th>指标版本</th>
+                                <th>当前状态</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody id="rejectedTaskTableBody"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
+</div>
+
+<div id="approvalTimelineModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>审批留痕</h3>
+            <button class="close-btn" onclick="closeApprovalTimelineModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>时间</th>
+                        <th>阶段</th>
+                        <th>角色/人员</th>
+                        <th>结果</th>
+                        <th>意见</th>
+                    </tr>
+                    </thead>
+                    <tbody id="approvalTimelineBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- 添加/编辑用户模态框 -->
