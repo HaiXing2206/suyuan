@@ -11,4 +11,5 @@ public interface EvaluationTaskRepository extends JpaRepository<EvaluationTask, 
     List<EvaluationTask> findByStatus(String status);
     List<EvaluationTask> findByOwner(String owner);
     List<EvaluationTask> findByArchiveStatus(String archiveStatus);
+    List<EvaluationTask> findAllByOrderByCreatedAtDesc();
 }
