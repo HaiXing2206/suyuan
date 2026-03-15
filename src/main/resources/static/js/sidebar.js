@@ -80,9 +80,14 @@ const menuItems = [
         link: '/users'
     },
     {
-        title: '治理与评估任务',
+        title: '数据治理',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 21H3"></path><path d="M3 10h18"></path><path d="M3 7h18"></path><path d="M3 14h18"></path><path d="M3 17h18"></path></svg>',
         link: '/analysis'
+    },
+    {
+        title: '评估任务',
+        icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>',
+        link: '/tasks'
     },
     {
         title: '归档与审计',
