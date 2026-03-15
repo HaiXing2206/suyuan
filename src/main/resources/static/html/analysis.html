@@ -12,19 +12,11 @@
 </head>
 <body>
 <div class="container">
-    <!-- 侧边栏容器 -->
     <div class="sidebar-container"></div>
 
-    <!-- 主内容区 -->
     <main class="main-content">
         <header class="header">
-            <div class="search-bar">
-<!--                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">-->
-<!--                    <circle cx="11" cy="11" r="8"></circle>-->
-<!--                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>-->
-<!--                </svg>-->
-<!--                <input type="search" placeholder="搜索...">-->
-            </div>
+            <div class="search-bar"></div>
             <div class="user-info">
                 <a href="personal-info.html" class="username-link">
                     <span id="currentUsername"></span>
@@ -43,32 +35,40 @@
         <div class="content">
             <div class="page-header">
                 <h2>数据治理</h2>
-                <p>查看治理相关的数据统计和分析能力</p>
+                <p>围绕“台账-分类分级-敏感识别-归档闭环”的治理看板，直观反映当前治理质量</p>
             </div>
 
             <div class="stats-cards">
                 <div class="card">
                     <div class="card-body">
-                        <h3>总扫描次数</h3>
-                        <p class="description">所有产品的二维码扫描总次数</p>
-                        <div class="stat-value" id="qrScanCount">0</div>
-                        <p class="stat-change" id="qrScanGrowth">0%</p>
+                        <h3>台账要素总数</h3>
+                        <p class="description">已登记的数据要素数量</p>
+                        <div class="stat-value" id="ledgerTotalCount">0</div>
+                        <p class="stat-change neutral">实时统计</p>
                     </div>
                 </div>
                 <div class="card">
                     <div class="card-body">
-                        <h3>平均追踪时长</h3>
-                        <p class="description">产品在供应链中的平均追踪时间</p>
-                        <div class="stat-value" id="avgTrackingTime">0天</div>
-                        <p class="stat-change" id="trackingGrowth">0%</p>
+                        <h3>敏感数据占比</h3>
+                        <p class="description">敏感要素在台账中的占比</p>
+                        <div class="stat-value" id="sensitiveRatio">0%</div>
+                        <p class="stat-change" id="sensitiveCountText">敏感 0 条</p>
                     </div>
                 </div>
                 <div class="card">
                     <div class="card-body">
-                        <h3>活跃用户数</h3>
-                        <p class="description">本月使用系统的活跃用户数</p>
-                        <div class="stat-value" id="activeUsers">0</div>
-                        <p class="stat-change" id="userGrowth">0%</p>
+                        <h3>归档完成率</h3>
+                        <p class="description">已归档要素占比</p>
+                        <div class="stat-value" id="archiveRatio">0%</div>
+                        <p class="stat-change" id="archiveCountText">已归档 0 条</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h3>近30天新增</h3>
+                        <p class="description">最近30天新增入账要素</p>
+                        <div class="stat-value" id="recentIncrement">0</div>
+                        <p class="stat-change neutral">持续更新中</p>
                     </div>
                 </div>
             </div>
@@ -76,32 +76,43 @@
             <div class="dashboard-grid">
                 <div class="card">
                     <div class="card-header">
-                        <h3>热门产品排行</h3>
-                        <p class="description">扫描次数最多的前5个产品</p>
+                        <h3>分类分级分布</h3>
+                        <p class="description">业务数据/运营数据/敏感数据占比</p>
                     </div>
                     <div class="card-body">
-                        <canvas id="productTypeChart" height="250"></canvas>
+                        <canvas id="classificationChart" height="250"></canvas>
                     </div>
                 </div>
 
                 <div class="card">
                     <div class="card-header">
-                        <h3>供应链节点分析</h3>
-                        <p class="description">产品在各供应链节点的停留时间</p>
+                        <h3>数据等级分布</h3>
+                        <p class="description">L1-L3治理等级覆盖情况</p>
                     </div>
                     <div class="card-body">
-                        <canvas id="supplyChainChart" height="250"></canvas>
+                        <canvas id="levelChart" height="250"></canvas>
                     </div>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <h3>月度扫描趋势</h3>
-                    <p class="description">过去12个月的二维码扫描次数统计</p>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>部门治理负载 TOP5</h3>
+                        <p class="description">按要素数量统计重点治理部门</p>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="departmentChart" height="250"></canvas>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <canvas id="monthlyScanChart" height="250"></canvas>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>月度入账趋势</h3>
+                        <p class="description">按创建时间统计台账新增趋势</p>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="monthlyLedgerChart" height="250"></canvas>
+                    </div>
                 </div>
             </div>
 
@@ -110,7 +121,6 @@
 </div>
 
 <script>
-    // 显示当前用户名
     document.addEventListener('DOMContentLoaded', function() {
         const username = localStorage.getItem('username');
         if (username) {
@@ -119,4 +129,4 @@
     });
 </script>
 </body>
-</html> 
+</html>
