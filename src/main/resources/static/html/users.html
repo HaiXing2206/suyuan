@@ -41,7 +41,7 @@
 
         <div class="content">
             <div class="page-header">
-                <h2>用户管理</h2>
+                <h2>审核与报告中心</h2>
                 <button class="btn-primary" onclick="showAddUserModal(event)">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -156,6 +156,28 @@
                         <button class="btn btn-outline" type="button" onclick="loadEvaluationReports()">刷新报告记录</button>
                     </div>
 
+
+                    <div class="stats-cards" style="margin-top: 16px;">
+                        <div class="card">
+                            <div class="card-body">
+                                <h3>已生成报告</h3>
+                                <div id="reportGeneratedCount" class="stat-value">0</div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <h3>已导出报告</h3>
+                                <div id="reportExportedCount" class="stat-value">0</div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <h3>已归档报告</h3>
+                                <div id="reportArchivedCount" class="stat-value">0</div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="table-responsive" style="margin-top: 16px;">
                         <table class="table">
                             <thead>
@@ -171,6 +193,24 @@
                             </tr>
                             </thead>
                             <tbody id="reportTableBody"></tbody>
+                        </table>
+                    </div>
+
+
+                    <div class="table-responsive" style="margin-top: 16px;">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>导出记录ID</th>
+                                <th>任务ID/名称</th>
+                                <th>报告版本</th>
+                                <th>导出格式</th>
+                                <th>导出状态</th>
+                                <th>归档状态</th>
+                                <th>导出/创建时间</th>
+                            </tr>
+                            </thead>
+                            <tbody id="exportRecordTableBody"></tbody>
                         </table>
                     </div>
                 </div>

@@ -294,8 +294,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadUsers();
     loadPendingApprovals();
     loadRejectedTasks();
-    loadReportTaskOptions();
-    loadEvaluationReports();
+    loadReportTaskOptions().then(() => loadEvaluationReports());
 });
 
 
@@ -544,15 +543,23 @@ async function loadReportTaskOptions() {
         const taskList = Array.isArray(tasks) ? tasks : [];
         if (taskList.length === 0) {
             taskSelect.innerHTML = '<option value="">暂无任务</option>';
+            resetReportSummary();
+            renderExportRecords([], '-');
             return;
         }
 
+        const currentValue = taskSelect.value;
         taskSelect.innerHTML = taskList.map(task => {
             const statusLabel = formatApprovalStatus(task.status);
             return `<option value="${task.taskId}">${task.taskName || task.taskId}（${statusLabel}）</option>`;
         }).join('');
+
+        const hasCurrent = taskList.some(task => task.taskId === currentValue);
+        taskSelect.value = hasCurrent ? currentValue : taskList[0].taskId;
     } catch (error) {
         taskSelect.innerHTML = `<option value="">${error.message}</option>`;
+        resetReportSummary();
+        renderExportRecords([], '-');
     }
 }
 
@@ -566,6 +573,8 @@ async function loadEvaluationReports() {
     const taskId = taskSelect.value;
     if (!taskId) {
         reportBody.innerHTML = '<tr><td colspan="8">请先选择评估任务</td></tr>';
+        resetReportSummary();
+        renderExportRecords([], '-');
         return;
     }
 
@@ -587,17 +596,22 @@ async function loadEvaluationReports() {
         }
 
         const reportList = Array.isArray(reports) ? reports : [];
+        renderReportSummary(reportList);
+        renderExportRecords(reportList, taskName);
+
         if (reportList.length === 0) {
             reportBody.innerHTML = '<tr><td colspan="8">当前任务暂无报告记录</td></tr>';
             return;
         }
 
-        reportBody.innerHTML = reportList.map(report => `
+        reportBody.innerHTML = reportList.map(report => {
+            const previewUrl = normalizePreviewUrl(report.previewUrl);
+            return `
             <tr>
                 <td>${report.id || '-'}</td>
                 <td>${report.taskId || '-'}<br><span class="font-medium">${taskName}</span></td>
                 <td>${report.templateName || '-'} / ${report.reportVersion || '-'}</td>
-                <td><a href="${report.previewUrl || '#'}" target="_blank">${report.previewUrl || '-'}</a></td>
+                <td><a href="${previewUrl}" target="_blank">${report.previewUrl || '-'}</a></td>
                 <td>${formatReportExportStatus(report.exportStatus)}${report.exportFormat ? `（${report.exportFormat}）` : ''}</td>
                 <td>${formatArchiveStatus(report.archiveStatus)}</td>
                 <td>${formatDate(report.createdAt)}</td>
@@ -605,14 +619,72 @@ async function loadEvaluationReports() {
                     <div class="action-buttons">
                         <button class="btn btn-outline" onclick="exportEvaluationReport('${report.id}', 'PDF')">导出PDF</button>
                         <button class="btn btn-outline" onclick="exportEvaluationReport('${report.id}', 'WORD')">导出Word</button>
-                        <button class="btn btn-primary" onclick="publishEvaluationReport('${report.id}')">发布归档</button>
+                        <button class="btn btn-primary" onclick="publishEvaluationReport('${report.id}')" ${report.archiveStatus === 'ARCHIVED' ? 'disabled' : ''}>发布归档</button>
                     </div>
                 </td>
             </tr>
-        `).join('');
+            `;
+        }).join('');
     } catch (error) {
         reportBody.innerHTML = `<tr><td colspan="8">${error.message}</td></tr>`;
+        resetReportSummary();
+        renderExportRecords([], '-');
     }
+}
+
+function renderReportSummary(reportList) {
+    const generated = document.getElementById('reportGeneratedCount');
+    const exported = document.getElementById('reportExportedCount');
+    const archived = document.getElementById('reportArchivedCount');
+    if (!generated || !exported || !archived) {
+        return;
+    }
+
+    const safeList = Array.isArray(reportList) ? reportList : [];
+    generated.textContent = String(safeList.length);
+    exported.textContent = String(safeList.filter(item => item.exportStatus === 'EXPORTED').length);
+    archived.textContent = String(safeList.filter(item => item.archiveStatus === 'ARCHIVED').length);
+}
+
+function resetReportSummary() {
+    renderReportSummary([]);
+}
+
+function renderExportRecords(reportList, taskName) {
+    const exportBody = document.getElementById('exportRecordTableBody');
+    if (!exportBody) {
+        return;
+    }
+
+    const safeList = (Array.isArray(reportList) ? reportList : [])
+        .filter(item => item.exportStatus === 'EXPORTED');
+
+    if (safeList.length === 0) {
+        exportBody.innerHTML = '<tr><td colspan="7">暂无导出记录</td></tr>';
+        return;
+    }
+
+    exportBody.innerHTML = safeList.map(record => `
+        <tr>
+            <td>${record.id || '-'}</td>
+            <td>${record.taskId || '-'}<br><span class="font-medium">${taskName || '-'}</span></td>
+            <td>${record.reportVersion || '-'}</td>
+            <td>${record.exportFormat || '-'}</td>
+            <td>${formatReportExportStatus(record.exportStatus)}</td>
+            <td>${formatArchiveStatus(record.archiveStatus)}</td>
+            <td>${formatDate(record.createdAt)}</td>
+        </tr>
+    `).join('');
+}
+
+function normalizePreviewUrl(previewUrl) {
+    if (!previewUrl) {
+        return '#';
+    }
+    if (/^https?:\/\//.test(previewUrl)) {
+        return previewUrl;
+    }
+    return `${window.location.origin}${previewUrl}`;
 }
 
 async function generateEvaluationReport() {
