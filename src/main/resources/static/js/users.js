@@ -310,6 +310,33 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+function initReviewReportTabs() {
+    const tabContainer = document.getElementById('reviewReportTabs');
+    if (!tabContainer) {
+        return;
+    }
+
+    const tabButtons = tabContainer.querySelectorAll('.tab-button');
+    const tabPanes = document.querySelectorAll('.main-content .tab-pane');
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const targetId = button.dataset.tab;
+            if (!targetId) {
+                return;
+            }
+
+            tabButtons.forEach(btn => {
+                btn.classList.toggle('active', btn === button);
+            });
+
+            tabPanes.forEach(pane => {
+                pane.classList.toggle('active', pane.id === targetId);
+            });
+        });
+    });
+}
+
 
 function getStageByRole(role) {
     const map = {
