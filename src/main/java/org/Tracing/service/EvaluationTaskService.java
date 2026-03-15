@@ -60,7 +60,7 @@ public class EvaluationTaskService {
             task.setResultScore(result.score);
             task.setResultGrade(result.grade);
             task.setIssueList(result.issues);
-            task.setStatus("RESULT_READY");
+            task.setStatus("PENDING_INITIAL_REVIEW");
             EvaluationTask saved = evaluationTaskRepository.save(task);
             writeAuditLog(taskId, "SUBMIT_CALC", operatorName, "SUCCESS", "触发评估并自动回填结果");
             return saved;
@@ -74,7 +74,7 @@ public class EvaluationTaskService {
             task.setResultScore(request.getResultScore());
             task.setResultGrade(defaultText(request.getResultGrade(), calculateGrade(request.getResultScore())));
             task.setIssueList(defaultText(request.getIssueList(), "[]"));
-            task.setStatus("RESULT_READY");
+            task.setStatus("PENDING_INITIAL_REVIEW");
             EvaluationTask saved = evaluationTaskRepository.save(task);
             writeAuditLog(taskId, "BACKFILL_RESULT", operatorName, "SUCCESS", "手动回填评估结果");
             return saved;

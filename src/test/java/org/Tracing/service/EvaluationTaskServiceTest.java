@@ -62,7 +62,7 @@ class EvaluationTaskServiceTest {
 
         EvaluationTask updated = evaluationTaskService.submitCalculation("task-001", "tester").orElseThrow();
 
-        assertEquals("RESULT_READY", updated.getStatus());
+        assertEquals("PENDING_INITIAL_REVIEW", updated.getStatus());
         assertNotNull(updated.getResultScore());
         assertNotNull(updated.getResultGrade());
     }
