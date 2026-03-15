@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>数据分析 - 产品溯源管理系统</title>
+    <title>数据治理 - 产品溯源管理系统</title>
     <link rel="stylesheet" href="../css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../js/auth.js"></script>
@@ -42,8 +42,8 @@
 
         <div class="content">
             <div class="page-header">
-                <h2>数据分析</h2>
-                <p>查看产品溯源系统的各项数据统计和分析</p>
+                <h2>数据治理</h2>
+                <p>查看治理相关的数据统计和分析能力</p>
             </div>
 
             <div class="stats-cards">
@@ -105,100 +105,6 @@
                 </div>
             </div>
 
-            <div class="card" id="tasks">
-                <div class="card-header">
-                    <h3>评估任务引擎对接与结果回填</h3>
-                    <p class="description">支持任务创建、指标版本选择、提交计算、结果回填和审阅</p>
-                </div>
-                <div class="card-body">
-                    <form id="evaluationTaskForm" class="form-grid">
-                        <div class="form-group">
-                            <label for="taskName">任务名称</label>
-                            <input type="text" id="taskName" required placeholder="例如：2026Q1-数据要素评估">
-                        </div>
-                        <div class="form-group">
-                            <label for="elementId">数据要素ID</label>
-                            <input type="text" id="elementId" required placeholder="关联台账 element_id">
-                        </div>
-                        <div class="form-group">
-                            <label for="indicatorVersion">指标体系版本</label>
-                            <select id="indicatorVersion" required>
-                                <option value="V1.0">V1.0</option>
-                                <option value="V1.1">V1.1</option>
-                                <option value="V2.0">V2.0</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="dueTime">截止时间</label>
-                            <input type="datetime-local" id="dueTime" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="taskDataLevel">数据分级</label>
-                            <select id="taskDataLevel">
-                                <option value="L1">L1</option>
-                                <option value="L2" selected>L2</option>
-                                <option value="L3">L3</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="taskSensitiveFlag">敏感数据</label>
-                            <select id="taskSensitiveFlag">
-                                <option value="false" selected>否</option>
-                                <option value="true">是</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary">创建评估任务</button>
-                    </form>
-
-                    <div class="table-responsive" style="margin-top: 16px;">
-                        <table class="table">
-                            <thead>
-                            <tr>
-                                <th>任务名称</th>
-                                <th>数据要素ID</th>
-                                <th>指标版本</th>
-                                <th>状态</th>
-                                <th>得分/等级</th>
-                                <th>问题项</th>
-                                <th>操作</th>
-                            </tr>
-                            </thead>
-                            <tbody id="evaluationTaskTableBody"></tbody>
-                        </table>
-                    </div>
-
-                    <div id="taskResultPanel" class="card" style="margin-top: 16px; display: none;">
-                        <div class="card-header">
-                            <h3>任务结果审阅与回填</h3>
-                            <p class="description" id="selectedTaskTitle">请选择任务后查看详情</p>
-                        </div>
-                        <div class="card-body">
-                            <form id="taskResultForm" class="form-grid">
-                                <input type="hidden" id="selectedTaskId">
-                                <div class="form-group">
-                                    <label for="resultScore">回填得分</label>
-                                    <input type="number" id="resultScore" min="0" max="100" step="0.01" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="resultGrade">回填等级</label>
-                                    <select id="resultGrade">
-                                        <option value="">自动计算</option>
-                                        <option value="A">A</option>
-                                        <option value="B">B</option>
-                                        <option value="C">C</option>
-                                        <option value="D">D</option>
-                                    </select>
-                                </div>
-                                <div class="form-group" style="grid-column: 1 / -1;">
-                                    <label for="issueList">问题项</label>
-                                    <textarea id="issueList" rows="3" placeholder="多个问题建议使用分号分隔"></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-primary">保存回填结果</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </main>
 </div>
