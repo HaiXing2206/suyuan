@@ -25,6 +25,9 @@ async function loadSidebar() {
         // 加载系统名称
         await fetchSystemName();
 
+        // 初始化侧边栏显隐开关
+        initSidebarToggle();
+
         // 触发侧边栏加载完成事件
         window.dispatchEvent(new Event('sidebarLoaded'));
     } catch (error) {
@@ -61,6 +64,48 @@ async function fetchSystemName() {
 
 // 页面加载完成后执行
 document.addEventListener('DOMContentLoaded', loadSidebar);
+
+function createToggleIcon(isCollapsed) {
+    return isCollapsed
+        ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><line x1="3" y1="12" x2="21" y2="12"></line><polyline points="9 18 15 12 9 6"></polyline></svg>'
+        : '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><line x1="3" y1="12" x2="21" y2="12"></line><polyline points="15 18 9 12 15 6"></polyline></svg>';
+}
+
+function applySidebarState(isCollapsed) {
+    document.body.classList.toggle('sidebar-collapsed', isCollapsed);
+    localStorage.setItem('sidebarCollapsed', String(isCollapsed));
+
+    const toggleBtn = document.getElementById('sidebarToggleBtn');
+    if (toggleBtn) {
+        toggleBtn.innerHTML = createToggleIcon(isCollapsed);
+        toggleBtn.setAttribute('aria-label', isCollapsed ? '展开侧边栏' : '隐藏侧边栏');
+        toggleBtn.setAttribute('title', isCollapsed ? '展开侧边栏' : '隐藏侧边栏');
+    }
+}
+
+function initSidebarToggle() {
+    const header = document.querySelector('.header .search-bar') || document.querySelector('.header');
+    if (!header || document.getElementById('sidebarToggleBtn')) {
+        return;
+    }
+
+    const toggleBtn = document.createElement('button');
+    toggleBtn.id = 'sidebarToggleBtn';
+    toggleBtn.type = 'button';
+    toggleBtn.className = 'sidebar-toggle-btn';
+
+    const savedState = localStorage.getItem('sidebarCollapsed') === 'true';
+    applySidebarState(savedState);
+
+    toggleBtn.addEventListener('click', () => {
+        const isCollapsed = !document.body.classList.contains('sidebar-collapsed');
+        applySidebarState(isCollapsed);
+    });
+
+    header.prepend(toggleBtn);
+    applySidebarState(savedState);
+}
+
 
 // 侧边栏菜单项
 const menuItems = [
