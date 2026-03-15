@@ -104,6 +104,69 @@
                     <canvas id="monthlyScanChart" height="250"></canvas>
                 </div>
             </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>评估任务引擎对接与结果回填</h3>
+                    <p class="description">支持任务创建、指标版本选择、提交计算、结果回填和审阅</p>
+                </div>
+                <div class="card-body">
+                    <form id="evaluationTaskForm" class="form-grid">
+                        <div class="form-group">
+                            <label for="taskName">任务名称</label>
+                            <input type="text" id="taskName" required placeholder="例如：2026Q1-数据要素评估">
+                        </div>
+                        <div class="form-group">
+                            <label for="elementId">数据要素ID</label>
+                            <input type="text" id="elementId" required placeholder="关联台账 element_id">
+                        </div>
+                        <div class="form-group">
+                            <label for="indicatorVersion">指标体系版本</label>
+                            <select id="indicatorVersion" required>
+                                <option value="V1.0">V1.0</option>
+                                <option value="V1.1">V1.1</option>
+                                <option value="V2.0">V2.0</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="dueTime">截止时间</label>
+                            <input type="datetime-local" id="dueTime" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskDataLevel">数据分级</label>
+                            <select id="taskDataLevel">
+                                <option value="L1">L1</option>
+                                <option value="L2" selected>L2</option>
+                                <option value="L3">L3</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskSensitiveFlag">敏感数据</label>
+                            <select id="taskSensitiveFlag">
+                                <option value="false" selected>否</option>
+                                <option value="true">是</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">创建评估任务</button>
+                    </form>
+
+                    <div class="table-responsive" style="margin-top: 16px;">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>任务名称</th>
+                                <th>指标版本</th>
+                                <th>状态</th>
+                                <th>得分/等级</th>
+                                <th>问题项</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody id="evaluationTaskTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 </div>

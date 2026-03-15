@@ -445,10 +445,104 @@ function initCharts() {
     initMonthlyScanChart();
 }
 
+function bindEvaluationTaskForm() {
+    const form = document.getElementById('evaluationTaskForm');
+    if (!form) {
+        return;
+    }
+
+    const defaultDueTime = document.getElementById('dueTime');
+    if (defaultDueTime) {
+        const nextDay = new Date(Date.now() + 24 * 60 * 60 * 1000);
+        defaultDueTime.value = new Date(nextDay.getTime() - nextDay.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    }
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const payload = {
+            taskName: document.getElementById('taskName').value,
+            elementId: document.getElementById('elementId').value,
+            indicatorVersion: document.getElementById('indicatorVersion').value,
+            owner: localStorage.getItem('username') || 'system',
+            dueTime: document.getElementById('dueTime').value,
+            dataLevel: document.getElementById('taskDataLevel').value,
+            sensitiveFlag: document.getElementById('taskSensitiveFlag').value === 'true'
+        };
+
+        try {
+            const response = await fetch('/api/evaluation-tasks', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) {
+                throw new Error('创建失败');
+            }
+            form.reset();
+            showNotification('评估任务创建成功', 'success');
+            await loadEvaluationTasks();
+        } catch (error) {
+            showNotification(`评估任务创建失败：${error.message}`, 'error');
+        }
+    });
+}
+
+async function triggerTaskCalculation(taskId) {
+    try {
+        const operatorName = localStorage.getItem('username') || 'system';
+        const response = await fetch(`/api/evaluation-tasks/${taskId}/submit-calc?operatorName=${encodeURIComponent(operatorName)}`, {
+            method: 'POST'
+        });
+        if (!response.ok) {
+            throw new Error('提交计算失败');
+        }
+        showNotification('已提交计算并回填结果', 'success');
+        await loadEvaluationTasks();
+    } catch (error) {
+        showNotification(`提交失败：${error.message}`, 'error');
+    }
+}
+
+async function loadEvaluationTasks() {
+    const tableBody = document.getElementById('evaluationTaskTableBody');
+    if (!tableBody) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/evaluation-tasks');
+        if (!response.ok) {
+            throw new Error('获取任务失败');
+        }
+        const tasks = await response.json();
+        if (!Array.isArray(tasks) || tasks.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="6">暂无评估任务，请先创建。</td></tr>';
+            return;
+        }
+
+        tableBody.innerHTML = tasks.map(task => `
+            <tr>
+                <td>${task.taskName || '-'}</td>
+                <td>${task.indicatorVersion || '-'}</td>
+                <td>${task.status || '-'}</td>
+                <td>${task.resultScore || '-'} / ${task.resultGrade || '-'}</td>
+                <td title="${task.issueList || ''}">${(task.issueList || '-').slice(0, 28)}</td>
+                <td>
+                    <button class="btn btn-outline" onclick="triggerTaskCalculation('${task.taskId}')">提交计算</button>
+                </td>
+            </tr>
+        `).join('');
+    } catch (error) {
+        tableBody.innerHTML = `<tr><td colspan="6">${error.message}</td></tr>`;
+    }
+}
+
 // 页面加载完成后初始化图表
 document.addEventListener('DOMContentLoaded', function() {
     initCharts();
     fetchStatistics();
     fetchSupplyChainAnalysis();
     fetchProductTypeDistribution();
-}); 
+    bindEvaluationTaskForm();
+    loadEvaluationTasks();
+});
