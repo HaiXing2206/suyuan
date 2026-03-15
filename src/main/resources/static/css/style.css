@@ -421,6 +421,13 @@ nav li.active a {
     background-color: var(--bg-hover);
 }
 
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    align-items: end;
+}
+
 .font-medium {
     font-weight: 500;
 }

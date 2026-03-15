@@ -74,6 +74,53 @@
                     </div>
                 </div>
             </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>多角色审核复核流程</h3>
+                    <p class="description">支持初审/复审/终审、驳回补件、重新提交和意见留痕</p>
+                </div>
+                <div class="card-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="approverRoleFilter">审批角色</label>
+                            <select id="approverRoleFilter">
+                                <option value="BUSINESS_REVIEWER">初审（业务）</option>
+                                <option value="RISK_REVIEWER">复审（治理/风控）</option>
+                                <option value="MANAGER">终审（管理）</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="approvalComment">审批意见</label>
+                            <input id="approvalComment" type="text" placeholder="请输入审批意见/驳回原因">
+                        </div>
+                        <div class="form-group">
+                            <label for="approvalStage">审批阶段</label>
+                            <select id="approvalStage">
+                                <option value="INITIAL">初审</option>
+                                <option value="REVIEW">复审</option>
+                                <option value="FINAL">终审</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-outline" type="button" onclick="loadPendingApprovals()">刷新待办</button>
+                    </div>
+
+                    <div class="table-responsive" style="margin-top: 16px;">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>任务名称</th>
+                                <th>指标版本</th>
+                                <th>当前状态</th>
+                                <th>得分/等级</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody id="approvalTaskTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 </div>
