@@ -105,7 +105,7 @@
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card" id="tasks">
                 <div class="card-header">
                     <h3>评估任务引擎对接与结果回填</h3>
                     <p class="description">支持任务创建、指标版本选择、提交计算、结果回填和审阅</p>
@@ -155,6 +155,7 @@
                             <thead>
                             <tr>
                                 <th>任务名称</th>
+                                <th>数据要素ID</th>
                                 <th>指标版本</th>
                                 <th>状态</th>
                                 <th>得分/等级</th>
@@ -164,6 +165,37 @@
                             </thead>
                             <tbody id="evaluationTaskTableBody"></tbody>
                         </table>
+                    </div>
+
+                    <div id="taskResultPanel" class="card" style="margin-top: 16px; display: none;">
+                        <div class="card-header">
+                            <h3>任务结果审阅与回填</h3>
+                            <p class="description" id="selectedTaskTitle">请选择任务后查看详情</p>
+                        </div>
+                        <div class="card-body">
+                            <form id="taskResultForm" class="form-grid">
+                                <input type="hidden" id="selectedTaskId">
+                                <div class="form-group">
+                                    <label for="resultScore">回填得分</label>
+                                    <input type="number" id="resultScore" min="0" max="100" step="0.01" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="resultGrade">回填等级</label>
+                                    <select id="resultGrade">
+                                        <option value="">自动计算</option>
+                                        <option value="A">A</option>
+                                        <option value="B">B</option>
+                                        <option value="C">C</option>
+                                        <option value="D">D</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="grid-column: 1 / -1;">
+                                    <label for="issueList">问题项</label>
+                                    <textarea id="issueList" rows="3" placeholder="多个问题建议使用分号分隔"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">保存回填结果</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
