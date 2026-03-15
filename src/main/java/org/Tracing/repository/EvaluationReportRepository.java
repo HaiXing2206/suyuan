@@ -9,5 +9,6 @@ import java.util.List;
 @Repository
 public interface EvaluationReportRepository extends JpaRepository<EvaluationReport, Long> {
     List<EvaluationReport> findByTaskId(String taskId);
+    List<EvaluationReport> findByTaskIdOrderByCreatedAtDesc(String taskId);
     List<EvaluationReport> findByArchiveStatus(String archiveStatus);
 }
