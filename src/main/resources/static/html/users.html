@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>用户管理 - 产品溯源管理系统</title>
+    <title>审核与报告中心 - 数据要素评估与审计平台</title>
     <link rel="stylesheet" href="../css/style.css">
     <script src="../js/auth.js"></script>
     <script src="../js/users.js"></script>
@@ -129,6 +129,48 @@
                             </tr>
                             </thead>
                             <tbody id="rejectedTaskTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 16px;">
+                <div class="card-header">
+                    <h3>报告中心与归档</h3>
+                    <p class="description">按任务生成报告、在线预览、导出记录、发布归档与版本留痕</p>
+                </div>
+                <div class="card-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="reportTaskSelect">评估任务</label>
+                            <select id="reportTaskSelect"></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="reportTemplate">报告模板</label>
+                            <select id="reportTemplate">
+                                <option value="STANDARD">标准模板（STANDARD）</option>
+                                <option value="DEPARTMENT">部门模板（DEPARTMENT）</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" type="button" onclick="generateEvaluationReport()">生成报告</button>
+                        <button class="btn btn-outline" type="button" onclick="loadEvaluationReports()">刷新报告记录</button>
+                    </div>
+
+                    <div class="table-responsive" style="margin-top: 16px;">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>报告ID</th>
+                                <th>任务ID/名称</th>
+                                <th>模板/版本</th>
+                                <th>预览</th>
+                                <th>导出状态</th>
+                                <th>归档状态</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody id="reportTableBody"></tbody>
                         </table>
                     </div>
                 </div>

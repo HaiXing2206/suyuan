@@ -70,7 +70,13 @@ function getRoleName(role) {
 
 // 格式化日期
 function formatDate(dateString) {
+    if (!dateString) {
+        return '-';
+    }
     const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) {
+        return '-';
+    }
     return date.toLocaleString('zh-CN', {
         year: 'numeric',
         month: '2-digit',
@@ -268,6 +274,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 300));
     }
 
+    const taskSelect = document.getElementById('reportTaskSelect');
+    if (taskSelect) {
+        taskSelect.addEventListener('change', () => {
+            loadEvaluationReports();
+        });
+    }
+
     const roleSelect = document.getElementById('approverRoleFilter');
     if (roleSelect) {
         roleSelect.addEventListener('change', () => {
@@ -281,6 +294,8 @@ document.addEventListener('DOMContentLoaded', function() {
     loadUsers();
     loadPendingApprovals();
     loadRejectedTasks();
+    loadReportTaskOptions();
+    loadEvaluationReports();
 });
 
 
@@ -511,3 +526,176 @@ function showToast(message, type = 'info') {
         }, 300);
     }, 3000);
 } 
+
+
+async function loadReportTaskOptions() {
+    const taskSelect = document.getElementById('reportTaskSelect');
+    if (!taskSelect) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/evaluation-tasks');
+        if (!response.ok) {
+            throw new Error('加载评估任务失败');
+        }
+
+        const tasks = await response.json();
+        const taskList = Array.isArray(tasks) ? tasks : [];
+        if (taskList.length === 0) {
+            taskSelect.innerHTML = '<option value="">暂无任务</option>';
+            return;
+        }
+
+        taskSelect.innerHTML = taskList.map(task => {
+            const statusLabel = formatApprovalStatus(task.status);
+            return `<option value="${task.taskId}">${task.taskName || task.taskId}（${statusLabel}）</option>`;
+        }).join('');
+    } catch (error) {
+        taskSelect.innerHTML = `<option value="">${error.message}</option>`;
+    }
+}
+
+async function loadEvaluationReports() {
+    const reportBody = document.getElementById('reportTableBody');
+    const taskSelect = document.getElementById('reportTaskSelect');
+    if (!reportBody || !taskSelect) {
+        return;
+    }
+
+    const taskId = taskSelect.value;
+    if (!taskId) {
+        reportBody.innerHTML = '<tr><td colspan="8">请先选择评估任务</td></tr>';
+        return;
+    }
+
+    try {
+        const [reportResponse, taskResponse] = await Promise.all([
+            fetch(`/api/evaluation-reports/task/${encodeURIComponent(taskId)}`),
+            fetch(`/api/evaluation-tasks/${encodeURIComponent(taskId)}`)
+        ]);
+
+        if (!reportResponse.ok) {
+            throw new Error('加载报告列表失败');
+        }
+
+        const reports = await reportResponse.json();
+        let taskName = taskId;
+        if (taskResponse.ok) {
+            const task = await taskResponse.json();
+            taskName = task.taskName || taskId;
+        }
+
+        const reportList = Array.isArray(reports) ? reports : [];
+        if (reportList.length === 0) {
+            reportBody.innerHTML = '<tr><td colspan="8">当前任务暂无报告记录</td></tr>';
+            return;
+        }
+
+        reportBody.innerHTML = reportList.map(report => `
+            <tr>
+                <td>${report.id || '-'}</td>
+                <td>${report.taskId || '-'}<br><span class="font-medium">${taskName}</span></td>
+                <td>${report.templateName || '-'} / ${report.reportVersion || '-'}</td>
+                <td><a href="${report.previewUrl || '#'}" target="_blank">${report.previewUrl || '-'}</a></td>
+                <td>${formatReportExportStatus(report.exportStatus)}${report.exportFormat ? `（${report.exportFormat}）` : ''}</td>
+                <td>${formatArchiveStatus(report.archiveStatus)}</td>
+                <td>${formatDate(report.createdAt)}</td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn btn-outline" onclick="exportEvaluationReport('${report.id}', 'PDF')">导出PDF</button>
+                        <button class="btn btn-outline" onclick="exportEvaluationReport('${report.id}', 'WORD')">导出Word</button>
+                        <button class="btn btn-primary" onclick="publishEvaluationReport('${report.id}')">发布归档</button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    } catch (error) {
+        reportBody.innerHTML = `<tr><td colspan="8">${error.message}</td></tr>`;
+    }
+}
+
+async function generateEvaluationReport() {
+    const taskId = document.getElementById('reportTaskSelect')?.value;
+    const templateName = document.getElementById('reportTemplate')?.value || 'STANDARD';
+    const operatorName = localStorage.getItem('username') || 'system';
+
+    if (!taskId) {
+        showToast('请先选择评估任务', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/evaluation-reports/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ taskId, templateName, operatorName })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || '生成报告失败');
+        }
+
+        showToast('报告生成成功', 'success');
+        await loadEvaluationReports();
+    } catch (error) {
+        showToast(error.message, 'error');
+    }
+}
+
+async function exportEvaluationReport(reportId, format) {
+    const operatorName = localStorage.getItem('username') || 'system';
+
+    try {
+        const response = await fetch(`/api/evaluation-reports/${reportId}/export?format=${encodeURIComponent(format)}&operatorName=${encodeURIComponent(operatorName)}`, {
+            method: 'POST'
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || '导出报告失败');
+        }
+
+        showToast(`报告已标记为${format}导出`, 'success');
+        await loadEvaluationReports();
+    } catch (error) {
+        showToast(error.message, 'error');
+    }
+}
+
+async function publishEvaluationReport(reportId) {
+    const operatorName = localStorage.getItem('username') || 'system';
+
+    try {
+        const response = await fetch(`/api/evaluation-reports/${reportId}/publish?operatorName=${encodeURIComponent(operatorName)}`, {
+            method: 'POST'
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || '发布归档失败');
+        }
+
+        showToast('报告已发布并归档', 'success');
+        await Promise.all([loadEvaluationReports(), loadReportTaskOptions()]);
+    } catch (error) {
+        showToast(error.message, 'error');
+    }
+}
+
+function formatReportExportStatus(status) {
+    const map = {
+        GENERATED: '已生成',
+        EXPORTED: '已导出'
+    };
+    return map[status] || status || '-';
+}
+
+function formatArchiveStatus(status) {
+    const map = {
+        ACTIVE: '未归档',
+        ARCHIVED: '已归档'
+    };
+    return map[status] || status || '-';
+}
