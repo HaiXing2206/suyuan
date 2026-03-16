@@ -6,16 +6,21 @@ async function loadSidebar() {
         document.querySelector('.sidebar-container').innerHTML = html;
         
         // 设置当前页面的激活状态
-        const currentPage = window.location.pathname.split('/').pop();
+        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        const currentTab = new URLSearchParams(window.location.search).get('tab');
         const navItems = document.querySelectorAll('.sidebar nav li');
-        
+
         navItems.forEach(item => {
             const link = item.querySelector('a');
             const href = link.getAttribute('href');
-            
-            if (href === currentPage || 
-                (currentPage === '' && href === 'index.html') ||
-                (currentPage === 'index.html' && href === 'index.html')) {
+            const linkUrl = new URL(href, window.location.origin + window.location.pathname);
+            const linkPage = linkUrl.pathname.split('/').pop() || 'index.html';
+            const linkTab = linkUrl.searchParams.get('tab');
+
+            const isSamePage = linkPage === currentPage;
+            const isTabMatch = !linkTab || linkTab === currentTab;
+
+            if (isSamePage && isTabMatch) {
                 item.classList.add('active');
             } else {
                 item.classList.remove('active');

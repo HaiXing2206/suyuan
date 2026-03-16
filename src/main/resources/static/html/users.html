@@ -40,7 +40,7 @@
         </header>
 
         <div class="content">
-            <div class="page-header">
+            <div class="page-header" id="userCenterHeader">
                 <h2>用户审核中心</h2>
                 <button class="btn-primary" onclick="showAddUserModal(event)">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -52,7 +52,11 @@
             </div>
 
 
-            <div class="card">
+            <div class="page-header" id="approvalHeader" style="display: none;">
+                <h2>审核</h2>
+            </div>
+
+            <div class="card" id="userCenterCard">
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table">
@@ -76,7 +80,7 @@
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card" id="approvalCard">
                 <div class="card-header">
                     <h3>多角色审核复核流程</h3>
                     <p class="description">支持初审/复审/终审、驳回补件、重新提交和意见留痕</p>
@@ -215,6 +219,32 @@
         </div>
     </div>
 </div>
+
+<script>
+    function switchUsersPageByTab() {
+        const tab = new URLSearchParams(window.location.search).get('tab');
+        const showApprovalOnly = tab !== 'user-center';
+
+        const userCenterHeader = document.getElementById('userCenterHeader');
+        const userCenterCard = document.getElementById('userCenterCard');
+        const approvalHeader = document.getElementById('approvalHeader');
+        const approvalCard = document.getElementById('approvalCard');
+
+        if (showApprovalOnly) {
+            if (userCenterHeader) userCenterHeader.style.display = 'none';
+            if (userCenterCard) userCenterCard.style.display = 'none';
+            if (approvalHeader) approvalHeader.style.display = 'flex';
+            if (approvalCard) approvalCard.style.display = 'block';
+        } else {
+            if (userCenterHeader) userCenterHeader.style.display = 'flex';
+            if (userCenterCard) userCenterCard.style.display = 'block';
+            if (approvalHeader) approvalHeader.style.display = 'none';
+            if (approvalCard) approvalCard.style.display = 'none';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', switchUsersPageByTab);
+</script>
 
 <script>
     // 显示当前用户名
