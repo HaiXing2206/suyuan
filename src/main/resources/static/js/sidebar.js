@@ -6,16 +6,21 @@ async function loadSidebar() {
         document.querySelector('.sidebar-container').innerHTML = html;
         
         // 设置当前页面的激活状态
-        const currentPage = window.location.pathname.split('/').pop();
+        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        const currentTab = new URLSearchParams(window.location.search).get('tab');
         const navItems = document.querySelectorAll('.sidebar nav li');
-        
+
         navItems.forEach(item => {
             const link = item.querySelector('a');
             const href = link.getAttribute('href');
-            
-            if (href === currentPage || 
-                (currentPage === '' && href === 'index.html') ||
-                (currentPage === 'index.html' && href === 'index.html')) {
+            const linkUrl = new URL(href, window.location.origin + window.location.pathname);
+            const linkPage = linkUrl.pathname.split('/').pop() || 'index.html';
+            const linkTab = linkUrl.searchParams.get('tab');
+
+            const isSamePage = linkPage === currentPage;
+            const isTabMatch = !linkTab || linkTab === currentTab;
+
+            if (isSamePage && isTabMatch) {
                 item.classList.add('active');
             } else {
                 item.classList.remove('active');
@@ -120,7 +125,7 @@ const menuItems = [
         link: '/products'
     },
     {
-        title: '用户审核',
+        title: '审核',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
         link: '/users'
     },
